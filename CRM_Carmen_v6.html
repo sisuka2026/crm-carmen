@@ -1122,6 +1122,7 @@
     document.getElementById('statWarm').textContent = leads.filter(l => l.temp === 'warm').length;
     document.getElementById('statUrgent').textContent = leads.filter(l => daysSince(l.fecha) >= 3 && l.estado !== 'cerrado').length;
     initPanelHoy();
+    initVisitasAlert();
   }
 
   // ---- ACTIONS ----
@@ -1244,6 +1245,7 @@
   let filterTemp = 'all';
   let filterFase = 'all';
   let filterCurso = 'all';
+  let searchQuery = '';
 
   function setFilterTemp(v) {
     filterTemp = v;
@@ -1775,27 +1777,40 @@
     const file = input.files[0];
     if (!file) return;
     const reader = new FileReader();
+    reader.onerror = function() {
+      alert('❌ No se pudo leer el archivo. Inténtalo de nuevo.');
+      input.value = '';
+    };
     reader.onload = function(e) {
       try {
-        const datos = JSON.parse(e.target.result);
-        if (!Array.isArray(datos)) throw new Error('Formato incorrecto');
+        let raw = e.target.result;
+        // Limpiar BOM y espacios sobrantes
+        raw = raw.replace(/^\uFEFF/, '').trim();
+        const datos = JSON.parse(raw);
+        if (!Array.isArray(datos)) {
+          alert('❌ El archivo no contiene una lista de leads válida.');
+          input.value = '';
+          return;
+        }
         leads = datos;
         saveLeads();
         renderLeads();
         updateStats();
+        initVisitasAlert();
         alert(`✅ ${leads.length} leads restaurados correctamente.`);
       } catch(err) {
-        alert('❌ Error al restaurar: el archivo no es válido.');
+        alert('❌ Error al parsear el JSON: ' + err.message);
       }
       input.value = '';
     };
-    reader.readAsText(file);
+    reader.readAsText(file, 'UTF-8');
   }
 
   // ---- INIT ----
   loadLeads();
   initDate();
   renderLeads();
+  initVisitasAlert();
 </script>
 </body>
 </html>
