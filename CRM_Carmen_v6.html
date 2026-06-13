@@ -678,6 +678,8 @@
 <!-- TOOLBAR -->
 <div class="toolbar">
   <button class="btn-add" onclick="togglePanel('import'); document.getElementById('import').scrollIntoView({behavior:'smooth'})">📥 Importar desde NocoDB</button>
+  <button class="btn-add" onclick="exportarJSON()" style="background:var(--green);margin-top:8px;">💾 Guardar copia de seguridad</button>
+  <label class="btn-add" style="background:#7A6F65;margin-top:8px;display:block;text-align:center;cursor:pointer;">📂 Restaurar copia<input type="file" accept=".json" style="display:none" onchange="restaurarJSON(this)"></label>
 </div>
 
 <!-- FILTROS -->
@@ -1754,6 +1756,40 @@
 
     document.getElementById('panelHoyContent').innerHTML = html;
     document.getElementById('panelHoy').style.display = 'block';
+  }
+
+  // ---- BACKUP JSON ----
+  function exportarJSON() {
+    const data = JSON.stringify(leads, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const fecha = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `crm_carmen_backup_${fecha}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function restaurarJSON(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const datos = JSON.parse(e.target.result);
+        if (!Array.isArray(datos)) throw new Error('Formato incorrecto');
+        leads = datos;
+        saveLeads();
+        renderLeads();
+        updateStats();
+        alert(`✅ ${leads.length} leads restaurados correctamente.`);
+      } catch(err) {
+        alert('❌ Error al restaurar: el archivo no es válido.');
+      }
+      input.value = '';
+    };
+    reader.readAsText(file);
   }
 
   // ---- INIT ----
