@@ -1854,6 +1854,111 @@
     ]
   };
 
+  const SCRIPTS_VISITA_CONFIRMACION = [
+    { label: '✅ Confirmación – Día de la visita', color: '#0f3460', texto: 'Hola [Nombre] 😊\n\nSoy Carmen del Instituto Forma-t.\n\nTe escribo para confirmar si hoy te va bien venir al centro, tal como comentamos.\n\nQuedo pendiente, ¡gracias!' },
+    { label: '✅ Confirmación – Víspera', color: '#1e8449', texto: 'Hola [Nombre], soy Carmen del Instituto Forma-t.\n\nTe escribo para confirmar la visita de mañana al centro.\n\nQuedo pendiente de tu confirmación.\n\n¡Gracias!' },
+    { label: '📍 Recordatorio con dirección – Vilardell', color: '#117a65', texto: 'Hola [Nombre],\n\nTe espero el [FECHA_CITA] a las [HORA_CITA]\n\n📍 C/ Vilardell, 38 – Barcelona\n👉 https://maps.app.goo.gl/mYnYjpRVCnZb9rNh8\n\nSi no puedes venir, avísame con antelación y buscamos otro momento.\n\n¡Gracias!' },
+    { label: '📍 Recordatorio con dirección – Sant Pere d\'Abanto', color: '#6c3483', texto: 'Hola [Nombre],\n\nTe espero el [FECHA_CITA] a las [HORA_CITA]\n\n📍 C/ Sant Pere d\'Abanto, 4 – Barcelona\n👉 https://maps.app.goo.gl/wGMeHZGfcDeazqwC7\n\nSi no puedes venir, avísame con antelación y buscamos otro momento.\n\n¡Gracias!' },
+    { label: '👨‍👩‍👧 Recordatorio – Padres/Madres', color: '#ca6f1e', texto: 'Hola [Nombre],\n\nSolo quería recordarte que tenemos agendada nuestra visita el [FECHA_CITA] a las [HORA_CITA].\n\n📍 C/ Sant Pere d\'Abanto, 4 – Barcelona\n\nSi necesitáis modificar la cita, no dudéis en escribirme.\n\n¡Nos vemos pronto!\nCarmen' },
+  ];
+
+  const SCRIPTS_POST_VISITA = [
+    { label: '💬 Post-visita – Directa', color: '#0f3460', texto: 'Hola [Nombre],\n\n¿Qué tal te fue la visita? 😊\n\n¿Tienes ya alguna duda concreta o necesitas un empujoncito para decidir?\n\nCarmen' },
+    { label: '💬 Post-visita – Cercana', color: '#1e8449', texto: 'Hola [Nombre],\n\n¿Qué tal te fue la visita? 😊\n\n¿Alguna duda o ya tienes clara la decisión?\n\nDime y seguimos.' },
+    { label: '💬 Post-visita – Con urgencia', color: '#117a65', texto: 'Hola [Nombre], soy Carmen del Instituto Forma-t.\n\nQuería escribirte para saber qué te pareció la visita al centro.\n\nMe gustaría saber si el ciclo encaja con lo que estás buscando o si necesitas resolver alguna duda antes de decidir.\n\nTe recuerdo que trabajamos con grupos reducidos (20 alumnos por clase), por eso es importante confirmar con tiempo para poder reservar tu plaza.\n\nQuedo pendiente.\n\nCarmen' },
+    { label: '👨‍👩‍👧 Post-visita – A padres', color: '#6c3483', texto: 'Hola [Nombre], soy Carmen, la asesora del centro.\n\n¡Un placer conocerles hoy! 😊\n\nSi tienen alguna duda o quieren asegurar la plaza, avísenme cuando quieran.\n\nCarmen' },
+  ];
+
+  const SCRIPTS_OBJECIONES = [
+    { label: '💰 "Es muy caro"', color: '#922b21', texto: 'Entiendo perfectamente que el precio sea una duda importante 😊\n\nTe cuento:\n- No es gratuito como la pública, pero no dependes de nota de corte ni listas de espera eternas.\n- Plaza garantizada al formalizar.\n- Tenemos pago fraccionado muy cómodo (hasta en muchos meses).\n\nY lo mejor: alta tasa de éxito = muy bajo riesgo de abandonar y perder dinero.\n\n¿Quieres que te mande las opciones de pago exactas para tu caso? Así lo ves con calma.' },
+    { label: '🤔 "Lo tengo que pensar"', color: '#1a5276', texto: 'Hola [Nombre] 😊\n\nSolo por organizarme un poquito:\n\n¿Sigues interesado/a en el curso o prefieres que lo dejemos para otra convocatoria más adelante?\n\nPuedes contestar con un simple:\nSí\nNo gracias\nLo pienso\n\n¡Gracias por el ratito! 🌸' },
+    { label: '👫 "Lo consulto con mi pareja/familia"', color: '#117a65', texto: 'Hola [Nombre], sin problema 😊\n\nCuando lo hayáis hablado, dime y seguimos.\n\nSolo te comento que los grupos son de 20 alumnos y las plazas se van cubriendo por orden de matrícula — si lo tenéis claro, mejor no esperar demasiado.\n\nQuedo pendiente.' },
+    { label: '🌱 Cierre sin presión + PDF', color: '#2e86c1', texto: 'No hay prisa, [Nombre], es una decisión importante 🌱\n\nPero con datos claros se decide mejor.\n¿Quieres que te mande un PDF con:\n- Precios y pagos fraccionados\n- Plan de estudios\n- Salidas laborales reales\n- Testimonios de alumnos?\n\nAsí lo ves tranquil@ y me dices si seguimos hablando. ¿Te lo envío? 😊' },
+    { label: '⏰ Urgencia real sin presionar', color: '#ca6f1e', texto: 'Hola 😊 Al tratarse de un instituto privado, las matrículas no se asignan por nota, sino por orden de inscripción.\n\nSe van reservando conforme los alumnos se matriculan, por lo que cuanto antes hagas la reserva, mejor. Así te aseguras la plaza para septiembre.\n\nAdemas, las clases son reducidas: solo 20 alumnos por grupo, por eso solemos completar plazas con antelación.\n\nNo depende de una fecha oficial, depende de cuándo se llene el grupo. Una vez completo, no hay más plazas.\n\nSi quieres, te explico cómo hacer la reserva cuando lo decidas.' },
+  ];
+
+  const SCRIPTS_MATRICULA = [
+    { label: '📋 Cómo reservar plaza', color: '#0f3460', texto: 'Hola [Nombre]\n\nPerfecto, te explico cómo hacerlo.\n\nPuedes reservar tu plaza online directamente desde aquí:\n👉 institutoformat.com/pago-online\n(introduce tu nombre y apellidos correctamente)\n\nLa matrícula es de 400€ y una vez realizado el pago y entregada la documentación, tu plaza queda confirmada.\n\nSi eliges pago fraccionado, la primera cuota no se cobra hasta el 10 de octubre de 2026, por lo que ahora solo abonas la matrícula para asegurar tu plaza.\n\nDOCUMENTACIÓN NECESARIA:\n– DNI o NIE (foto por ambas caras)\n– Título de acceso\n– Tarjeta sanitaria y número de Seguridad Social\n– Teléfono y correo electrónico\n– Si pagas a plazos: número de cuenta y certificado de titularidad\n\nUn saludo, Carmen' },
+    { label: '🔗 Enlace pago matrícula', color: '#1a5276', texto: 'Hola 😊 Te dejo el enlace para que puedas hacer la reserva de tu matrícula:\n\n🔗 https://institutoformat.com/pago-online/\n\nUna vez realizado el pago, por favor envíame el comprobante por aquí.\n\n¡Gracias! Estoy pendiente de cualquier duda que tengas.\n\nUn abrazo,\nCarmen' },
+    { label: '💳 Pago único – Transferencia', color: '#1e8449', texto: 'Hola [Nombre] 😊\n\nComo vas a realizar el pago único, te paso los datos para la transferencia:\nIBAN: ES62 0081 0185 10 0001 3453 44\nTitular: FORMACIÓ INTEL·LIGENT, S.L.\nConcepto: nombre y apellidos del alumno\n\nDocumentación necesaria:\n✓ DNI o NIE (por ambas caras)\n✓ Teléfono y correo del alumno\n✓ Último título académico\n✓ Tarjeta sanitaria o nº Seguridad Social\n\nCuando realices la transferencia, envíame el comprobante.\n\nMuchas gracias 😊' },
+    { label: '📲 Matrícula a distancia', color: '#6c3483', texto: 'Hola 😊 No te preocupes, puedes hacer todo el proceso a distancia, no es necesario que vengas al centro.\n\nEl primer paso es realizar el pago de la matrícula para reservar tu plaza:\n👉 institutoformat.com/pago-online\n\nUna vez pagado, envíame el comprobante y la documentación por aquí.\n\nSi más adelante quieres venir al centro, será un placer recibirte 😊' },
+    { label: '🎉 Bienvenida – Email', color: '#117a65', texto: 'Hola [Nombre],\n\n¡Bienvenido/a al instituto! Encantada de tenerte.\n\nTe adjunto tu ficha de alumno/a y el contrato de compromiso de pago a plazos.\n\nEs necesario que ambos documentos estén firmados y me los devuelvas:\n✅ Ficha de alumno/a (pág. 2)\n✅ Compromiso de pago a plazos (pág. 3)\n\nEstoy a tu disposición para cualquier duda.\n\nUn cordial saludo,\nCarmen' },
+  ];
+
+  function crearScriptCard(s, nombre, telLimpio) {
+    const textoBase = s.texto
+      .replace(/\[Nombre\]/g, nombre)
+      .replace(/\[nombre\]/g, nombre);
+
+    const tieneGenero = /interesado\/a|apuntado\/a|dispuesto\/a/.test(textoBase);
+    const cardId = 'scard_' + (scriptCardCounter++);
+
+    const card = document.createElement('div');
+    card.id = cardId;
+    card.style.cssText = 'border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;';
+
+    const header = document.createElement('div');
+    header.style.cssText = `background:${s.color};color:white;padding:8px 12px;font-size:0.78rem;font-weight:700;`;
+    header.textContent = s.label;
+    card.appendChild(header);
+
+    if (tieneGenero) {
+      const genRow = document.createElement('div');
+      genRow.style.cssText = 'display:flex;gap:6px;padding:8px 12px 0;background:#F9FAFB;';
+      const lbl = document.createElement('span');
+      lbl.style.cssText = 'font-size:0.72rem;color:#6B7280;align-self:center;';
+      lbl.textContent = 'Género:';
+      genRow.appendChild(lbl);
+      ['m','f'].forEach(g => {
+        const btn = document.createElement('button');
+        btn.dataset.gen = g;
+        btn.style.cssText = 'padding:3px 10px;border-radius:20px;border:1px solid #D1D5DB;font-size:0.72rem;font-weight:600;cursor:pointer;background:white;';
+        btn.textContent = g === 'm' ? '♂ Él' : '♀ Ella';
+        btn.addEventListener('click', () => aplicarGenero(cardId, g, telLimpio));
+        genRow.appendChild(btn);
+      });
+      card.appendChild(genRow);
+    }
+
+    const textoDiv = document.createElement('div');
+    textoDiv.className = 'script-texto';
+    textoDiv.style.cssText = 'padding:10px 12px;font-size:0.8rem;color:#374151;white-space:pre-wrap;line-height:1.5;';
+    textoDiv.dataset.base = textoBase;
+    textoDiv.textContent = textoBase;
+    card.appendChild(textoDiv);
+
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:8px;padding:8px 12px;background:#F9FAFB;border-top:1px solid #E5E7EB;';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.style.cssText = 'flex:1;padding:7px;background:white;border:1px solid #D1D5DB;border-radius:7px;font-size:0.75rem;font-weight:600;cursor:pointer;';
+    copyBtn.textContent = '📋 Copiar';
+    copyBtn.dataset.texto = textoBase;
+    copyBtn.addEventListener('click', () => copiarScript(copyBtn));
+    btnRow.appendChild(copyBtn);
+
+    if (telLimpio) {
+      const waBtn = document.createElement('a');
+      waBtn.className = 'wa-btn';
+      waBtn.href = 'whatsapp://send?phone=' + telLimpio + '&text=' + encodeURIComponent(textoBase);
+      waBtn.style.cssText = 'flex:1;padding:7px;background:#25D366;color:white;border-radius:7px;font-size:0.75rem;font-weight:600;text-decoration:none;text-align:center;display:block;';
+      waBtn.textContent = '💬 Enviar WA';
+      btnRow.appendChild(waBtn);
+    }
+
+    card.appendChild(btnRow);
+    return card;
+  }
+
+  function crearSectionHeader(texto) {
+    const h = document.createElement('div');
+    h.style.cssText = 'font-size:0.75rem;font-weight:700;color:#7A6F65;text-transform:uppercase;letter-spacing:0.5px;margin:6px 0 -2px;padding-top:6px;border-top:1px solid #EDE9E3;';
+    h.textContent = texto;
+    return h;
+  }
+
+  let scriptCardCounter = 0;
+
   function verScripts(id) {
     const l = leads.find(x => x.id === id);
     if (!l) return;
@@ -1861,86 +1966,52 @@
     const nombre = primerNombre.charAt(0).toUpperCase() + primerNombre.slice(1).toLowerCase();
     const ciclo = l.ciclo || '';
     const fase = getLeadFase(l);
+    const telLimpio = (l.telefono || '').replace(/\D/g,'');
 
     document.getElementById('scriptLeadNombre').textContent = nombre;
     document.getElementById('scriptLeadCiclo').textContent = ciclo ? '📚 ' + ciclo : '';
     document.getElementById('scriptFaseBadge').innerHTML = fase ? `<span style="background:#EEF2FF;color:#3730A3;font-size:0.75rem;font-weight:600;padding:4px 10px;border-radius:20px;">Fase: ${fase}</span>` : '';
 
-    const telefono = l.telefono || '';
-    const scripts = SCRIPTS[fase] || SCRIPTS['default'];
-    const telLimpio = telefono.replace(/\D/g,'');
-
     const container = document.getElementById('scriptCards');
     container.innerHTML = '';
+    scriptCardCounter = 0;
 
-    scripts.forEach((s, idx) => {
-      const textoBase = s.texto
-        .replace(/\[Nombre\]/g, nombre)
-        .replace(/\[nombre\]/g, nombre);
+    // ---- SECCIÓN VISITA (confirmación o post-visita) ----
+    if (l.fechaCita) {
+      const datePart = (l.fechaCita+'').trim().match(/(\d{4})-(\d{2})-(\d{2})/);
+      let esFutura = true;
+      if (datePart) {
+        const hoy = new Date(); hoy.setHours(0,0,0,0);
+        const fechaCitaDate = new Date(+datePart[1], +datePart[2]-1, +datePart[3]);
+        esFutura = fechaCitaDate >= hoy;
+      }
+      const fechaStr = formatFechaConHora(l.fechaCita);
 
-      const tieneGenero = /interesado\/a|apuntado\/a|dispuesto\/a/.test(textoBase);
-      const cardId = 'scard_' + idx;
-
-      const card = document.createElement('div');
-      card.id = cardId;
-      card.style.cssText = 'border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;';
-
-      // Header
-      const header = document.createElement('div');
-      header.style.cssText = `background:${s.color};color:white;padding:8px 12px;font-size:0.78rem;font-weight:700;`;
-      header.textContent = s.label;
-      card.appendChild(header);
-
-      // Selector género
-      if (tieneGenero) {
-        const genRow = document.createElement('div');
-        genRow.style.cssText = 'display:flex;gap:6px;padding:8px 12px 0;background:#F9FAFB;';
-        const lbl = document.createElement('span');
-        lbl.style.cssText = 'font-size:0.72rem;color:#6B7280;align-self:center;';
-        lbl.textContent = 'Género:';
-        genRow.appendChild(lbl);
-        ['m','f'].forEach(g => {
-          const btn = document.createElement('button');
-          btn.dataset.gen = g;
-          btn.style.cssText = 'padding:3px 10px;border-radius:20px;border:1px solid #D1D5DB;font-size:0.72rem;font-weight:600;cursor:pointer;background:white;';
-          btn.textContent = g === 'm' ? '♂ Él' : '♀ Ella';
-          btn.addEventListener('click', () => aplicarGenero(cardId, g, telLimpio));
-          genRow.appendChild(btn);
+      if (esFutura) {
+        container.appendChild(crearSectionHeader('📅 Confirmación de visita'));
+        SCRIPTS_VISITA_CONFIRMACION.forEach(s => {
+          let textoAdaptado = s.texto.replace(/\[FECHA_CITA\]/g, fechaStr);
+          if (l.horaCita) {
+            textoAdaptado = textoAdaptado.replace(/\[HORA_CITA\]/g, l.horaCita);
+          } else {
+            textoAdaptado = textoAdaptado.replace(/ a las \[HORA_CITA\]/g, '');
+          }
+          container.appendChild(crearScriptCard(Object.assign({}, s, { texto: textoAdaptado }), nombre, telLimpio));
         });
-        card.appendChild(genRow);
+      } else if (fase !== 'Ganada') {
+        container.appendChild(crearSectionHeader('🏫 Seguimiento post-visita'));
+        SCRIPTS_POST_VISITA.forEach(s => container.appendChild(crearScriptCard(s, nombre, telLimpio)));
       }
+    }
 
-      // Texto
-      const textoDiv = document.createElement('div');
-      textoDiv.className = 'script-texto';
-      textoDiv.style.cssText = 'padding:10px 12px;font-size:0.8rem;color:#374151;white-space:pre-wrap;line-height:1.5;';
-      textoDiv.dataset.base = textoBase;
-      textoDiv.textContent = textoBase;
-      card.appendChild(textoDiv);
+    // ---- SECCIÓN FASE ----
+    const scripts = fase === 'Ganada' ? SCRIPTS_MATRICULA : (SCRIPTS[fase] || SCRIPTS['default']);
+    container.appendChild(crearSectionHeader(fase === 'Ganada' ? '🎉 Matrícula y bienvenida' : '💬 Mensajes para esta fase'));
+    scripts.forEach(s => container.appendChild(crearScriptCard(s, nombre, telLimpio)));
 
-      // Botones
-      const btnRow = document.createElement('div');
-      btnRow.style.cssText = 'display:flex;gap:8px;padding:8px 12px;background:#F9FAFB;border-top:1px solid #E5E7EB;';
-
-      const copyBtn = document.createElement('button');
-      copyBtn.style.cssText = 'flex:1;padding:7px;background:white;border:1px solid #D1D5DB;border-radius:7px;font-size:0.75rem;font-weight:600;cursor:pointer;';
-      copyBtn.textContent = '📋 Copiar';
-      copyBtn.dataset.texto = textoBase;
-      copyBtn.addEventListener('click', () => copiarScript(copyBtn));
-      btnRow.appendChild(copyBtn);
-
-      if (telLimpio) {
-        const waBtn = document.createElement('a');
-        waBtn.className = 'wa-btn';
-        waBtn.href = 'whatsapp://send?phone=' + telLimpio + '&text=' + encodeURIComponent(textoBase);
-        waBtn.style.cssText = 'flex:1;padding:7px;background:#25D366;color:white;border-radius:7px;font-size:0.75rem;font-weight:600;text-decoration:none;text-align:center;display:block;';
-        waBtn.textContent = '💬 Enviar WA';
-        btnRow.appendChild(waBtn);
-      }
-
-      card.appendChild(btnRow);
-      container.appendChild(card);
-    });
+    // ---- SECCIÓN OBJECIONES ----
+    container.appendChild(crearSectionHeader('💡 Objeciones rápidas'));
+    SCRIPTS_OBJECIONES.forEach(s => container.appendChild(crearScriptCard(s, nombre, telLimpio)));
 
     document.getElementById('modalScripts').style.display = 'block';
     document.body.style.overflow = 'hidden';
