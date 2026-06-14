@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Carmen</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #F5F2EE;
+    --surface: #FFFFFF;
+    --surface2: #EDE9E3;
+    --border: #D8D0C4;
+    --text: #2A2520;
+    --text2: #7A6F65;
+    --accent: #C4622A;
+    --accent2: #E8956D;
+    --hot: #D94F2B;
+    --warm: #E8A840;
+    --cold: #7A9BBF;
+    --green: #4A9B6F;
+    --shadow: 0 2px 12px rgba(42,37,32,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 60px 0;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--bg);
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px 18px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .header-left h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.7rem;
+    line-height: 1;
+    letter-spacing: -0.5px;
+  }
+  .header-left h1 span { color: var(--accent); }
+  .header-left p {
+    font-size: 0.75rem;
+    color: var(--text2);
+    margin-top: 4px;
+    font-weight: 300;
+  }
+  .date-badge {
+    background: var(--accent);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat {
+    flex: 1;
+    background: var(--surface);
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1;
+    font-family: 'DM Serif Display', serif;
+  }
+  .stat-label { font-size: 0.62rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .stat-num.hot { color: var(--hot); }
+  .stat-num.warn { color: var(--warm); }
+  .stat-num.ok { color: var(--green); }
+
+  /* CRITERIOS */
+  .criterios-panel {
+    margin: 16px 16px 0;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .criterios-toggle {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text2);
+    user-select: none;
+  }
+  .criterios-toggle:hover { background: var(--surface2); }
+  .criterios-body {
+    display: none;
+    padding: 0 16px 14px;
+    border-top: 1px solid var(--border);
+  }
+  .criterios-body.open { display: block; }
+  .criterio-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--surface2);
+    font-size: 0.82rem;
+  }
+  .criterio-item:last-child { border-bottom: none; }
+  .criterio-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    margin-top: 4px; flex-shrink: 0;
+  }
+  .criterio-item strong { display: block; font-weight: 600; }
+  .criterio-item span { color: var(--text2); font-size: 0.77rem; }
+
+  /* TOOLBAR */
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    padding: 14px 16px 0;
+    flex-wrap: wrap;
+  }
+  .btn-add {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex: 1;
+    min-width: 140px;
+    transition: background 0.15s;
+  }
+  .btn-add:hover { background: #A8521F; }
+
+  /* FILTER BAR */
+  .filter-bar {
+    padding: 10px 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .filter-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .filter-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text2);
+    white-space: nowrap;
+    padding-top: 5px;
+    min-width: 72px;
+  }
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .fchip {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    color: var(--text2);
+    padding: 4px 11px;
+    border-radius: 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.73rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .fchip:hover { border-color: var(--accent); color: var(--accent); }
+  .fchip.active { background: var(--text); color: white; border-color: var(--text); }
+  .fchip-alert.active { background: var(--hot); border-color: var(--hot); }
+  .fchip-returning.active { background: var(--accent); border-color: var(--accent); }
+
+  /* LEADS LIST */
+  .leads-list {
+    padding: 12px 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text2);
+  }
+  .empty-state .emoji { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+  .empty-state p { font-size: 0.88rem; }
+
+  /* LEAD CARD */
+  .lead-card {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.1s;
+    position: relative;
+  }
+  .lead-card:active { transform: scale(0.99); }
+  .lead-card.urgente { border-left: 4px solid var(--hot); }
+  .lead-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px 10px;
+  }
+  .temp-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .lead-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.05rem;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .dias-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .dias-ok { background: #E8F5EE; color: var(--green); }
+  .dias-warn { background: #FEF3E2; color: var(--warm); }
+  .dias-danger { background: #FDECEA; color: var(--hot); }
+
+  .lead-meta {
+    display: flex;
+    gap: 6px;
+    padding: 0 14px 8px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    font-size: 0.7rem;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 500;
+    background: var(--surface2);
+    color: var(--text2);
+  }
+  .chip.ciclo { background: #EEF2F8; color: #3A5A8A; }
+  .chip.estado-pendiente { background: #FEF3E2; color: #9A6B00; }
+  .chip.estado-contactado { background: #EEF8F2; color: #2A7A50; }
+  .chip.estado-presupuesto { background: #EEF2FF; color: #4A3FA0; }
+  .chip.estado-cerrado { background: #E8F5EE; color: var(--green); }
+  .chip.estado-frio { background: #F0F4F8; color: var(--cold); }
+
+  .lead-nota {
+    padding: 0 14px 10px;
+    font-size: 0.78rem;
+    color: var(--text2);
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .lead-contacto {
+    display: flex;
+    gap: 8px;
+    padding: 0 14px 8px;
+    flex-wrap: wrap;
+  }
+  .contacto-link {
+    font-size: 0.76rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px;
+    white-space: nowrap;
+    display: inline-block;
+  }
+  .contacto-link:hover, .contacto-link:active { background: var(--accent); color: white; }
+  .contacto-link.whatsapp { color: #25D366; border-color: #b2e8c6; }
+  .contacto-link.whatsapp:hover, .contacto-link.whatsapp:active { background: #25D366; color: white; border-color: #25D366; }
+  .contacto-link.outlook { color: #0078D4; border-color: #b3d6f5; }
+  .contacto-link.outlook:hover, .contacto-link.outlook:active { background: #0078D4; color: white; border-color: #0078D4; }
+
+  .lead-fechas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 14px 8px;
+  }
+  .fecha-item {
+    font-size: 0.74rem;
+    color: var(--text2);
+  }
+  .fecha-item strong { color: var(--text); }
+  .fecha-item.visita { color: #4A3FA0; }
+  .fecha-item.visita strong { color: #4A3FA0; }
+
+  .lead-actions {
+    display: flex;
+    border-top: 1px solid var(--surface2);
+  }
+  .lead-action-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 9px 6px;
+    font-size: 0.72rem;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    transition: background 0.12s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .lead-action-btn:not(:last-child) { border-right: 1px solid var(--surface2); }
+  .lead-action-btn:hover { background: var(--surface2); }
+  .lead-action-btn.delete:hover { background: #FDECEA; color: var(--hot); }
+  .lead-action-btn.contactar:hover { background: #EEF8F2; color: var(--green); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(42,37,32,0.55);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 600px;
+    padding: 20px 20px 32px;
+    animation: slideUp 0.22s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .modal h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+  }
+  .field-group { margin-bottom: 14px; }
+  .field-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text2);
+    margin-bottom: 6px;
+  }
+  .field-group input,
+  .field-group select,
+  .field-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field-group input:focus,
+  .field-group select:focus,
+  .field-group textarea:focus { border-color: var(--accent); }
+  .field-group textarea { resize: vertical; min-height: 64px; }
+
+  .temp-selector {
+    display: flex; gap: 8px;
+  }
+  .temp-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.12s;
+  }
+  .temp-btn.selected.hot { border-color: var(--hot); background: #FDECEA; color: var(--hot); }
+  .temp-btn.selected.warm { border-color: var(--warm); background: #FEF3E2; color: var(--warm); }
+  .temp-btn.selected.cold { border-color: var(--cold); background: #EEF2F8; color: var(--cold); }
+
+  .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .btn-save {
+    flex: 1;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 13px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-cancel {
+    background: var(--surface2);
+    color: var(--text2);
+    border: none;
+    padding: 13px 20px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+
+
+  .footer-note {
+    text-align: center;
+    font-size: 0.68rem;
+    color: var(--text2);
+    margin-top: 24px;
+    padding: 0 16px;
+  }
+
+  /* SEARCH BAR */
+  .search-bar {
+    padding: 12px 16px 0;
+  }
+  .search-input-wrap {
+    position: relative;
+  }
+  .search-input-wrap input {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input-wrap input:focus { border-color: var(--accent); }
+  .search-icon {
+    position: absolute;
+    left: 11px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .search-clear {
+    position: absolute;
+    right: 10px; top: 50%;
+    transform: translateY(-50%);
+    background: var(--border);
+    border: none;
+    border-radius: 50%;
+    width: 18px; height: 18px;
+    font-size: 0.65rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: var(--text2);
+  }
+  .import-section {
+    margin: 16px 16px 0;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .import-toggle {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text2);
+    user-select: none;
+  }
+  .import-toggle:hover { background: var(--surface2); }
+  .import-body { display: none; padding: 12px 16px 16px; border-top: 1px solid var(--border); }
+  .import-body.open { display: block; }
+  .import-hint { font-size: 0.78rem; color: var(--text2); margin-bottom: 10px; line-height: 1.5; }
+  .import-hint strong { color: var(--text); }
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--bg);
+    margin-bottom: 10px;
+  }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: #FEF6F2; }
+  .drop-zone p { font-size: 0.8rem; color: var(--text2); margin-top: 6px; }
+  .drop-zone .dz-icon { font-size: 1.8rem; }
+  #csvFileInput { display: none; }
+  .import-preview { display: none; margin-top: 10px; }
+  .import-preview.show { display: block; }
+  .preview-info { font-size: 0.78rem; color: var(--text2); margin-bottom: 8px; }
+  .preview-info strong { color: var(--text); }
+  .fase-filter-label { font-size: 0.75rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; display: block; }
+  .fase-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .fase-chip {
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: 0.73rem;
+    font-weight: 500;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .fase-chip.selected { border-color: var(--accent); background: #FEF0EA; color: var(--accent); }
+  .btn-import {
+    background: var(--accent); color: white; border: none;
+    padding: 11px 16px; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; width: 100%;
+  }
+  .btn-import:disabled { background: var(--border); color: var(--text2); cursor: default; }
+  .import-result { font-size: 0.78rem; padding: 8px 12px; border-radius: 6px; margin-top: 8px; display: none; }
+  .import-result.ok { background: #EEF8F2; color: var(--green); display: block; }
+  .import-result.err { background: #FDECEA; color: var(--hot); display: block; }
+  .import-result.warn { background: #FEF3E2; color: #9A6B00; display: block; white-space: pre-line; font-weight: 500; }
+  .vuelve-badge { background: #FFF0E0; color: #C4622A; font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; border: 1px solid #F5C89A; }
+  .contacto-link:active { background: var(--accent); color: white; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>CRM <span>Carmen</span></h1>
+  </div>
+  <div class="date-badge" id="dateBadge"></div>
+</div>
+
+<!-- AVISO VISITAS PRÓXIMAS -->
+<div id="visitasAlert" style="display:none;margin:12px 16px 0;background:#EEF2FF;border:1px solid #C7D2FE;border-radius:12px;padding:12px 14px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <span style="font-weight:700;font-size:0.85rem;color:#3730A3;">🏫 Visitas próximas (7 días)</span>
+    <button onclick="document.getElementById('visitasAlert').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:1rem;color:#6B7280;">✕</button>
+  </div>
+  <div id="visitasAlertList"></div>
+</div>
+
+<!-- PANEL HOY -->
+<div id="panelHoy" style="display:none;margin:12px 16px 0;background:#FFFBF5;border:1px solid #E8D5B0;border-radius:12px;padding:14px 16px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <span style="font-weight:700;font-size:0.88rem;color:#5C3D1A;">📋 Resumen del día</span>
+    <button onclick="document.getElementById('panelHoy').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:1rem;color:#6B7280;">✕</button>
+  </div>
+  <div id="panelHoyContent" style="font-size:0.82rem;color:#444;line-height:1.7;"></div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num" id="statTotal">0</div>
+    <div class="stat-label">Total</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num hot" id="statHot">0</div>
+    <div class="stat-label">🔥 Calientes</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num warn" id="statWarm">0</div>
+    <div class="stat-label">🌡️ Tibios</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num ok" id="statUrgent">0</div>
+    <div class="stat-label">⚡ Sin tocar 3d+</div>
+  </div>
+</div>
+
+<!-- CRITERIOS -->
+<div class="criterios-panel">
+  <div class="criterios-toggle" onclick="togglePanel('criterios')">
+    🎯 Criterios de leads <span id="criterios-arrow">▼</span>
+  </div>
+  <div class="criterios-body" id="criterios">
+    <div class="criterio-item">
+      <div class="criterio-dot" style="background:var(--hot)"></div>
+      <div>
+        <strong>🔥 CALIENTE</strong>
+        <span>Preguntó precio, matrícula, fechas o formas de pago · Mencionó urgencia ("quiero empezar en septiembre") · Está comparando centros · Ha vuelto a contactar (repetidor 🔁) · Tiene cita o visita programada</span>
+      </div>
+    </div>
+    <div class="criterio-item">
+      <div class="criterio-dot" style="background:var(--warm)"></div>
+      <div>
+        <strong>🌡️ TIBIO</strong>
+        <span>Interés claro pero con freno operativo (horario, modalidad, trabajo) · Está pensándolo o pidió más tiempo · Fase Info enviada o Recupón · Menos de 7 días sin respuesta</span>
+      </div>
+    </div>
+    <div class="criterio-item">
+      <div class="criterio-dot" style="background:var(--cold)"></div>
+      <div>
+        <strong>❄️ FRÍO</strong>
+        <span>Solo pidió info general sin señal de compra · Más de 14 días sin contacto · Baja, ilocalizable o cerrada · Dijo "ya miraré" o evasión clara</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BUSCADOR -->
+<div class="search-bar">
+  <div class="search-input-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Buscar por nombre, teléfono, email o ciclo..." oninput="onSearch(this.value)">
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <button class="btn-add" onclick="togglePanel('import'); document.getElementById('import').scrollIntoView({behavior:'smooth'})">📥 Importar desde NocoDB</button>
+  <button class="btn-add" onclick="exportarJSON()" style="background:var(--green);margin-top:8px;">💾 Guardar copia de seguridad</button>
+  <label class="btn-add" style="background:#7A6F65;margin-top:8px;display:block;text-align:center;cursor:pointer;">📂 Restaurar copia<input type="file" accept=".json" style="display:none" onchange="restaurarJSON(this)"></label>
+</div>
+
+<!-- FILTROS -->
+<div class="filter-bar">
+  <div class="filter-row">
+    <span class="filter-label">Temperatura</span>
+    <div class="filter-chips">
+      <button class="fchip active" data-group="temp" data-val="all" onclick="setFilterTemp('all')">Todas</button>
+      <button class="fchip" data-group="temp" data-val="hot" onclick="setFilterTemp('hot')">🔥 Caliente</button>
+      <button class="fchip" data-group="temp" data-val="warm" onclick="setFilterTemp('warm')">🌡️ Tibio</button>
+      <button class="fchip" data-group="temp" data-val="cold" onclick="setFilterTemp('cold')">❄️ Frío</button>
+      <button class="fchip fchip-alert" data-group="temp" data-val="urgent" onclick="setFilterTemp('urgent')">⚡ Sin tocar 3d+</button>
+      <button class="fchip fchip-returning" data-group="temp" data-val="vuelve" onclick="setFilterTemp('vuelve')">🔁 Repite</button>
+    </div>
+  </div>
+  <div class="filter-row">
+    <span class="filter-label">Fase venta</span>
+    <div class="filter-chips">
+      <button class="fchip active" data-group="fase" data-val="all" onclick="setFilterFase('all')">Todas</button>
+      <button class="fchip" data-group="fase" data-val="Info enviada" onclick="setFilterFase('Info enviada')">Info enviada</button>
+      <button class="fchip" data-group="fase" data-val="Recupón" onclick="setFilterFase('Recupón')">Recupón</button>
+      <button class="fchip" data-group="fase" data-val="Ganada" onclick="setFilterFase('Ganada')">✅ Ganada</button>
+      <button class="fchip" data-group="fase" data-val="Ilocalizable" onclick="setFilterFase('Ilocalizable')">Ilocalizable</button>
+    </div>
+  </div>
+  <div class="filter-row">
+    <span class="filter-label">Curso</span>
+    <div class="filter-chips">
+      <button class="fchip active" data-group="curso" data-val="all" onclick="setFilterCurso('all')">Todos</button>
+      <button class="fchip" data-group="curso" data-val="AP" onclick="setFilterCurso('AP')">AP</button>
+      <button class="fchip" data-group="curso" data-val="CAE" onclick="setFilterCurso('CAE')">CAE</button>
+      <button class="fchip" data-group="curso" data-val="DAS" onclick="setFilterCurso('DAS')">DAS</button>
+      <button class="fchip" data-group="curso" data-val="DIE" onclick="setFilterCurso('DIE')">DIE</button>
+      <button class="fchip" data-group="curso" data-val="FIP" onclick="setFilterCurso('FIP')">FIP</button>
+      <button class="fchip" data-group="curso" data-val="GESO" onclick="setFilterCurso('GESO')">GESO</button>
+      <button class="fchip" data-group="curso" data-val="HB" onclick="setFilterCurso('HB')">HB</button>
+      <button class="fchip" data-group="curso" data-val="IM" onclick="setFilterCurso('IM')">IM</button>
+      <button class="fchip" data-group="curso" data-val="IS" onclick="setFilterCurso('IS')">IS</button>
+      <button class="fchip" data-group="curso" data-val="LAB" onclick="setFilterCurso('LAB')">LAB</button>
+      <button class="fchip" data-group="curso" data-val="TAD" onclick="setFilterCurso('TAD')">TAD</button>
+      <button class="fchip" data-group="curso" data-val="AME" onclick="setFilterCurso('AME')">AME</button>
+      <button class="fchip" data-group="curso" data-val="AOD" onclick="setFilterCurso('AOD')">AOD</button>
+      <button class="fchip" data-group="curso" data-val="FIRP" onclick="setFilterCurso('FIRP')">FIRP</button>
+      <button class="fchip" data-group="curso" data-val="GA" onclick="setFilterCurso('GA')">GA</button>
+    </div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;padding:0 0 4px 80px;">
+      <button class="fchip" id="chipConVisita" onclick="toggleVisitaFilter()">🏫 Con visita</button>
+      <button class="fchip" id="chipVisitaSinCerrar" onclick="toggleVisitaSinCerrar()">🔥 Visita sin cerrar</button>
+    </div>
+</div>
+<div class="import-section">
+  <div class="import-toggle" onclick="togglePanel('import')">
+    📥 Importar leads desde NocoDB (CSV) <span id="import-arrow">▼</span>
+  </div>
+  <div class="import-body" id="import">
+    <p class="import-hint">Exporta tu tabla desde NocoDB como CSV y súbelo aquí. Se mapean automáticamente: <strong>Nombre, Apellidos, Curso, Fase_venta, Notas seguimiento, Fecha_seguimiento.</strong></p>
+
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('csvFileInput').click()" ondragover="dzOver(event)" ondragleave="dzLeave(event)" ondrop="dzDrop(event)">
+      <div class="dz-icon">📂</div>
+      <p>Toca para seleccionar el CSV<br><span style="font-size:0.72rem">o arrastra el archivo aquí</span></p>
+    </div>
+    <input type="file" id="csvFileInput" accept=".csv" onchange="handleCSV(this.files[0])">
+
+    <div class="import-preview" id="importPreview">
+      <div class="preview-info" id="previewInfo"></div>
+      <span class="fase-filter-label">Filtrar por Fase_venta (selecciona las que quieres importar):</span>
+      <div class="fase-chips" id="faseChips"></div>
+      <button class="btn-import" id="btnImport" onclick="doImport()">Importar seleccionados</button>
+      <div class="import-result" id="importResult"></div>
+    </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+      <p style="font-size:0.75rem;color:var(--text2);margin-bottom:8px;">⚠️ Si los leads no muestran teléfono/email, limpia y reimporta el CSV:</p>
+      <button onclick="limpiarTodo()" style="width:100%;padding:10px;background:#FDECEA;color:#D94F2B;border:1.5px solid #F5C4C0;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;">🗑️ Limpiar todos los leads e importar de cero</button>
+    </div>
+  </div>
+</div>
+
+<!-- LISTA -->
+<div class="leads-list" id="leadsList">
+  <div class="empty-state">
+    <span class="emoji">🎯</span>
+    <p>Añade tus primeros leads calientes del día.<br>Máximo 8 para mantener el foco.</p>
+  </div>
+</div>
+
+
+
+<div class="footer-note">Carmen Frutos · Solo para uso personal · No compartir</div>
+
+<!-- MODAL EDICIÓN -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 id="modalTitle">Editar lead</h2>
+
+    <div class="field-group">
+      <label>Nombre</label>
+      <input type="text" id="fNombre" placeholder="Nombre del lead">
+    </div>
+    <div class="field-group">
+      <label>Teléfono</label>
+      <input type="tel" id="fTelefono" placeholder="+34 600 000 000">
+    </div>
+    <div class="field-group">
+      <label>Email</label>
+      <input type="email" id="fEmail" placeholder="email@ejemplo.com">
+    </div>
+    <div class="field-group">
+      <label>Ciclo de interés</label>
+      <select id="fCiclo">
+        <option value="">— Selecciona ciclo —</option>
+        <option>Higiene Bucodental</option>
+        <option>Anatomía Patológica (SAND)</option>
+        <option>Laboratorio Clínico (SAEO)</option>
+        <option>CAE</option>
+        <option>Dietética</option>
+        <option>Imagen para el Diagnóstico</option>
+        <option>DAS</option>
+        <option>Integración Social</option>
+        <option>TAD</option>
+        <option>Farmacia</option>
+        <option>PFI Sanitario</option>
+        <option>GESO</option>
+        <option>Otro</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Temperatura</label>
+      <div class="temp-selector">
+        <button class="temp-btn hot selected" id="tb-hot" onclick="selectTemp('hot')">🔥 Caliente</button>
+        <button class="temp-btn warm" id="tb-warm" onclick="selectTemp('warm')">🌡️ Tibio</button>
+        <button class="temp-btn cold" id="tb-cold" onclick="selectTemp('cold')">❄️ Frío</button>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Estado</label>
+      <select id="fEstado">
+        <option value="pendiente">Pendiente de contactar</option>
+        <option value="contactado">Contactado</option>
+        <option value="presupuesto">Presupuesto enviado</option>
+        <option value="cerrado">Cerrado ✅</option>
+        <option value="frio">Se ha enfriado ❄️</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Fecha último contacto</label>
+      <input type="date" id="fFecha">
+    </div>
+    <div class="field-group">
+      <label>📅 Fecha visita (si tiene cita)</label>
+      <input type="date" id="fFechaCita">
+    </div>
+    <div class="field-group">
+      <label>🕐 Hora visita</label>
+      <input type="time" id="fHoraCita" placeholder="Ej: 10:30">
+    </div>
+
+    <!-- RECORDATORIO -->
+    <div class="field-group" style="background:#FFF8F0;border:1px solid #F0D9B5;border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+      <label style="color:#7A4E1A;">⏰ Recordatorio de seguimiento</label>
+      <input type="date" id="fRecordatorio" style="margin-bottom:6px;">
+      <input type="text" id="fRecordatorioNota" placeholder="Ej: Llamar para confirmar plaza, esperaba respuesta del jefe">
+    </div>
+
+    <!-- AÑADIR NOTA AL HISTORIAL -->
+    <div class="field-group" style="background:#F5F8FF;border:1px solid #D0DCF5;border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+      <label style="color:#2A4A8A;">📝 Añadir nota al historial</label>
+      <textarea id="fNotaNueva" placeholder="Ej: Ha llamado para preguntar precio. Muy interesada, espera respuesta de su empresa..." style="min-height:52px;"></textarea>
+      <div style="font-size:0.72rem;color:#888;margin-top:4px;">Se añadirá con la fecha de hoy. Las notas anteriores no se borran.</div>
+    </div>
+
+    <!-- HISTORIAL DE NOTAS -->
+    <div class="field-group">
+      <label>📋 Historial de notas</label>
+      <div id="fHistorial" style="background:#FAFAFA;border:1px solid #E5E7EB;border-radius:8px;padding:10px 12px;font-size:0.78rem;color:#555;max-height:140px;overflow-y:auto;line-height:1.6;"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveLead()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- DATA ----
+  const STORAGE_KEY = 'carmen_leads_v1';
+  let leads = [];
+  let editingId = null;
+  let currentFilter = 'all';
+  let selectedTemp = 'hot';
+
+  function loadLeads() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      leads = raw ? JSON.parse(raw) : [];
+    } catch(e) { leads = []; }
+  }
+
+  function saveLeads() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
+    } catch(e) {
+      // localStorage lleno — guardar solo los campos esenciales
+      try {
+        const slim = leads.map(l => ({
+          id: l.id, nombre: l.nombre, ciclo: l.ciclo, temp: l.temp,
+          estado: l.estado, fecha: l.fecha, fase: l.fase,
+          telefono: l.telefono, email: l.email,
+          nota: (l.nota||'').slice(0, 100),
+          fechaCita: l.fechaCita, horaCita: l.horaCita,
+          importado: l.importado, vuelve: l.vuelve,
+          recordatorio: l.recordatorio, recordatorioNota: l.recordatorioNota,
+          historial: l.historial
+        }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(slim));
+      } catch(e2) {
+        console.warn('localStorage lleno, no se pudo guardar:', e2);
+      }
+    }
+  }
+
+  // ---- DATE ----
+  function formatDate(d) {
+    const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
+  }
+
+  function daysSince(dateStr) {
+    if (!dateStr) return 999;
+    const d = new Date(dateStr);
+    const now = new Date();
+    return Math.floor((now - d) / (1000*60*60*24));
+  }
+
+  function initDate() {
+    document.getElementById('dateBadge').textContent = formatDate(new Date());
+    // set today default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('fFecha').value = today;
+  }
+
+  function estadoToFase(estado) {
+    const map = {
+      pendiente: 'Recupón',
+      contactado: 'Info enviada',
+      presupuesto: 'Info enviada',
+      cerrado: 'Ganada',
+      frio: 'Baja'
+    };
+    return map[estado] || 'Info enviada';
+  }
+
+  // Devuelve la fase real del lead: usa l.fase si existe (leads importados),
+  // o calcula desde estado (leads manuales)
+  function getLeadFase(l) {
+    return (l.fase || estadoToFase(l.estado) || '').trim();
+  }
+
+  function formatFecha(dateStr) {
+    if (!dateStr) return '';
+    // Recorta la parte de fecha y hora ignorando timezone
+    const clean = dateStr.trim().replace('+00:00','').replace('Z','');
+    const d = new Date(clean);
+    if (isNaN(d)) return dateStr;
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yy = String(d.getFullYear()).slice(-2);
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  function formatFechaConHora(dateStr) {
+    if (!dateStr) return '';
+    const d = dateStr.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return d ? `${d[3]}/${d[2]}/${d[1].slice(-2)}` : dateStr;
+  }
+
+  // ---- RENDER ----
+  function getTempIcon(t, fase, nota, fecha) {
+    if (fase === 'Ganada') return '🏆';
+    // Tooltip con criterio
+    const textos = {
+      hot:  'CALIENTE · Preguntó precio/fechas, urgencia o vuelve a contactar',
+      warm: 'TIBIO · Interés claro con freno operativo, está valorándolo',
+      cold: 'FRÍO · Sin señal clara, info general o >14 días sin respuesta'
+    };
+    const tip = textos[t] || '';
+    const icon = t === 'hot' ? '🔥' : t === 'warm' ? '🌡️' : '❄️';
+    return `<span title="${tip}" style="cursor:help">${icon}</span>`;
+  }
+
+  function getDiasBadge(dias) {
+    if (dias === 999) return `<span class="dias-badge dias-ok">Hoy</span>`;
+    if (dias === 0) return `<span class="dias-badge dias-ok">Hoy</span>`;
+    if (dias <= 2) return `<span class="dias-badge dias-ok">${dias}d</span>`;
+    if (dias <= 5) return `<span class="dias-badge dias-warn">${dias}d ⚠️</span>`;
+    return `<span class="dias-badge dias-danger">${dias}d 🚨</span>`;
+  }
+
+  function getFaseChip(fase) {
+    const map = {
+      'Ganada':        ['estado-cerrado',    '🎉 Ganada'],
+      'Info enviada':  ['estado-contactado', '📨 Info enviada'],
+      'Recupón':       ['estado-pendiente',  '🔄 Recupón'],
+      'Baja':          ['estado-frio',       '❄️ Baja'],
+      'Ilocalizable':  ['estado-frio',       '📵 Ilocalizable'],
+      'Cerrada - Null':['estado-frio',       '🚫 Cerrada'],
+    };
+    const [cls, label] = map[fase] || ['', fase];
+    return `<span class="chip ${cls}">${label}</span>`;
+  }
+
+  function getEstadoChip(e) {
+    const map = {
+      pendiente: ['estado-pendiente','⏳ Pendiente'],
+      contactado: ['estado-contactado','✅ Contactado'],
+      presupuesto: ['estado-presupuesto','📋 Presupuesto'],
+      cerrado: ['estado-cerrado','🎉 Cerrado'],
+      frio: ['estado-frio','❄️ Frío']
+    };
+    const [cls, label] = map[e] || ['',''];
+    return `<span class="chip ${cls}">${label}</span>`;
+  }
+
+  function renderLeads() {
+    const list = document.getElementById('leadsList');
+    let filtered = leads.filter(l => {
+      // Búsqueda
+      if (searchQuery) {
+        const hay = [l.nombre, l.telefono, l.email, l.ciclo, l.nota].join(' ').toLowerCase();
+        if (!hay.includes(searchQuery)) return false;
+      }
+
+      // Si el filtro de visita está activo, solo importa que tenga fechaCita
+      if (filterVisita === 'con_visita') {
+        return !!l.fechaCita;
+      }
+      // Visita sin cerrar: vino a ver las instalaciones pero no está ganado
+      if (filterVisita === 'visita_sin_cerrar') {
+        return !!l.fechaCita && getLeadFase(l) !== 'Ganada';
+      }
+
+      // Temperatura / estado especial
+      if (filterTemp === 'hot') { if (l.temp !== 'hot' || getLeadFase(l) === 'Ganada') return false; }
+      else if (filterTemp === 'warm') { if (l.temp !== 'warm' || getLeadFase(l) === 'Ganada') return false; }
+      else if (filterTemp === 'cold') { if (l.temp !== 'cold' || getLeadFase(l) === 'Ganada') return false; }
+      else if (filterTemp === 'urgent') { if (daysSince(l.fecha) < 3 || l.estado === 'cerrado' || getLeadFase(l) === 'Ganada') return false; }
+      else if (filterTemp === 'vuelve') { if (!l.vuelve) return false; }
+
+      // Fase venta — en 'all', ocultar Ganadas por defecto
+      if (filterFase === 'all') {
+        if (getLeadFase(l) === 'Ganada') return false;
+      } else {
+        const faseReal = getLeadFase(l);
+        if (faseReal !== filterFase.trim()) return false;
+      }
+
+      // Curso — comparar contra ciclo (código o nombre completo, insensible a mayúsculas)
+      if (filterCurso !== 'all') {
+        const ciclo = (l.ciclo || '').toUpperCase().trim();
+        if (ciclo !== filterCurso.toUpperCase()) return false;
+      }
+
+      // Rango de fechas de seguimiento
+      if (filterFechaDesde || filterFechaHasta) {
+        const fechaLead = parseDate(l.fecha);
+        if (!fechaLead) return false;
+        const fechaLeadStr = fechaLead.toISOString().split('T')[0];
+        if (filterFechaDesde && fechaLeadStr < filterFechaDesde) return false;
+        if (filterFechaHasta && fechaLeadStr > filterFechaHasta) return false;
+      }
+
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      const isUrgent = filterTemp === 'urgent';
+      list.innerHTML = `<div class="empty-state"><span class="emoji">${isUrgent ? '✅' : '🎯'}</span><p>${isUrgent ? 'Ningún lead sin tocar más de 3 días. ¡Bien hecho!' : 'No hay leads en esta categoría.'}</p></div>`;
+      return;
+    }
+
+    // Sort: hot first, then by days (more days = more urgent)
+    filtered.sort((a,b) => {
+      if (a.temp === 'hot' && b.temp !== 'hot') return -1;
+      if (b.temp === 'hot' && a.temp !== 'hot') return 1;
+      return daysSince(b.fecha) - daysSince(a.fecha);
+    });
+
+    list.innerHTML = filtered.map(l => {
+      const dias = daysSince(l.fecha);
+      const urgente = dias >= 3 && l.estado !== 'cerrado';
+      return `
+        <div class="lead-card ${urgente ? 'urgente' : ''}" id="card-${l.id}">
+          <div class="lead-card-header">
+            <div class="temp-icon">${getTempIcon(l.temp, l.fase)}</div>
+            <div class="lead-name">${l.nombre}</div>
+            ${getDiasBadge(dias)}
+          </div>
+          <div class="lead-meta">
+            ${l.ciclo ? `<span class="chip ciclo">${l.ciclo}</span>` : ''}
+            ${l.fase ? getFaseChip(l.fase) : getEstadoChip(l.estado)}
+            ${l.vuelve ? `<span class="vuelve-badge">🔁 Vuelve ${l.vuelve}ª vez</span>` : ''}
+          </div>
+          ${l.nota ? `<div class="lead-nota">"${l.nota}"</div>` : ''}
+          ${(l.telefono || l.email) ? `<div class="lead-contacto">
+            ${l.telefono ? `<a href="tel:${l.telefono}" class="contacto-link">📞 ${l.telefono}</a>` : ''}
+            ${l.telefono ? `<a href="whatsapp://send?phone=${l.telefono.replace(/\D/g,'')}" class="contacto-link whatsapp">💬 WhatsApp</a>` : ''}
+            ${l.email ? `<a href="mailto:${l.email}" class="contacto-link">✉️ ${l.email}</a>` : ''}
+          </div>` : ''}
+          ${(l.fecha || l.fechaCita) ? `<div class="lead-fechas">
+            ${l.fecha ? `<span class="fecha-item" style="${daysSince(l.fecha) >= 3 ? 'color:var(--hot)' : 'color:var(--text2)'}">
+              ${daysSince(l.fecha) >= 3 ? '⚠️' : '📅'} Seguimiento: <strong>${formatFecha(l.fecha)}</strong></span>` : ''}
+            ${l.fechaCita ? `<span class="fecha-item visita">🏫 Visita: <strong>${formatFechaConHora(l.fechaCita)}${l.horaCita ? ' · ' + l.horaCita + 'h' : ''}</strong></span>` : ''}
+            ${l.recordatorio ? `<span class="fecha-item" style="color:#7A4E1A;">⏰ Recordatorio: <strong>${formatFechaConHora(l.recordatorio)}</strong>${l.recordatorioNota ? ' · ' + l.recordatorioNota : ''}</span>` : ''}
+          </div>` : ''}
+          <div class="lead-actions">
+            <button class="lead-action-btn" onclick="editLead('${l.id}')">✏️ Editar</button>
+            <button class="lead-action-btn" style="background:#EEF2FF;color:#3730A3;border-color:#C7D2FE;" onclick="verScripts('${l.id}')">💬 Scripts</button>
+            <button class="lead-action-btn delete" onclick="deleteLead('${l.id}')">🗑️</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    updateStats();
+    initVisitasAlert();
+  }
+
+  function updateStats() {
+    document.getElementById('statTotal').textContent = leads.length;
+    document.getElementById('statHot').textContent = leads.filter(l => l.temp === 'hot').length;
+    document.getElementById('statWarm').textContent = leads.filter(l => l.temp === 'warm').length;
+    document.getElementById('statUrgent').textContent = leads.filter(l => daysSince(l.fecha) >= 3 && l.estado !== 'cerrado').length;
+    initPanelHoy();
+    initVisitasAlert();
+  }
+
+  // ---- ACTIONS ----
+  function markContacted(id) {
+    const l = leads.find(x => x.id === id);
+    if (!l) return;
+    l.fecha = new Date().toISOString().split('T')[0];
+    l.estado = 'contactado';
+    saveLeads();
+    renderLeads();
+  }
+
+  function deleteLead(id) {
+    if (!confirm('¿Eliminar este lead?')) return;
+    leads = leads.filter(x => x.id !== id);
+    saveLeads();
+    renderLeads();
+  }
+
+  function editLead(id) {
+    const l = leads.find(x => x.id === id);
+    if (!l) return;
+    editingId = id;
+    document.getElementById('fNombre').value = l.nombre;
+    document.getElementById('fTelefono').value = l.telefono || '';
+    document.getElementById('fEmail').value = l.email || '';
+    document.getElementById('fCiclo').value = l.ciclo;
+    document.getElementById('fEstado').value = l.estado;
+    document.getElementById('fFecha').value = l.fecha;
+    const datePart = (l.fechaCita || '').trim().match(/^(\d{4}-\d{2}-\d{2})/)?.[1] || '';
+    document.getElementById('fFechaCita').value = datePart;
+    document.getElementById('fHoraCita').value = l.horaCita || '';
+    document.getElementById('fRecordatorio').value = l.recordatorio || '';
+    document.getElementById('fRecordatorioNota').value = l.recordatorioNota || '';
+    document.getElementById('fNotaNueva').value = '';
+    const hist = document.getElementById('fHistorial');
+    if (l.historial && l.historial.length > 0) {
+      hist.innerHTML = [...l.historial].reverse().map(h =>
+        `<div style="border-bottom:1px solid #eee;padding:4px 0;"><span style="color:#888;font-size:0.72rem;">${h.fecha}</span> · <span>${h.texto}</span></div>`
+      ).join('');
+    } else {
+      hist.innerHTML = '<span style="color:#aaa;font-style:italic;">Sin notas previas</span>';
+    }
+    selectTemp(l.temp);
+    document.getElementById('modalTitle').textContent = 'Editar · ' + l.nombre;
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+
+  function selectTemp(t) {
+    selectedTemp = t;
+    ['hot','warm','cold'].forEach(x => {
+      const btn = document.getElementById('tb-' + x);
+      btn.classList.remove('selected');
+    });
+    document.getElementById('tb-' + t).classList.add('selected');
+  }
+
+  function saveLead() {
+    if (!editingId) { closeModal(); return; }
+    const idx = leads.findIndex(x => x.id === editingId);
+    if (idx === -1) { closeModal(); return; }
+    const l = leads[idx];
+    const estado    = document.getElementById('fEstado').value;
+    const fechaCita = document.getElementById('fFechaCita').value;
+    const horaCita  = document.getElementById('fHoraCita').value;
+    const notaNueva = document.getElementById('fNotaNueva').value.trim();
+    const recordatorio = document.getElementById('fRecordatorio').value;
+    const recordatorioNota = document.getElementById('fRecordatorioNota').value.trim();
+
+    // Historial: acumular nota nueva con fecha de hoy
+    const historial = l.historial ? [...l.historial] : [];
+    if (notaNueva) {
+      const hoy = new Date().toLocaleDateString('es-ES', {day:'2-digit', month:'2-digit', year:'2-digit'});
+      historial.push({ fecha: hoy, texto: notaNueva });
+    }
+
+    const data = {
+      ...l,
+      nombre:    document.getElementById('fNombre').value.trim() || l.nombre,
+      telefono:  document.getElementById('fTelefono').value.trim(),
+      email:     document.getElementById('fEmail').value.trim(),
+      ciclo:     document.getElementById('fCiclo').value || l.ciclo,
+      temp:      selectedTemp,
+      estado,
+      fecha:     document.getElementById('fFecha').value || l.fecha,
+      nota:      notaNueva || l.nota,
+      fechaCita: fechaCita || '',
+      horaCita:  horaCita || '',
+      recordatorio,
+      recordatorioNota,
+      historial
+    };
+    leads[idx] = data;
+    saveLeads();
+    renderLeads();
+    closeModal();
+  }
+
+  function onSearch(val) {
+    searchQuery = val.toLowerCase().trim();
+    const clearBtn = document.getElementById('searchClear');
+    clearBtn.style.display = searchQuery ? 'flex' : 'none';
+    renderLeads();
+  }
+
+  function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    onSearch('');
+  }
+
+  // ---- FILTER ----
+  let filterTemp = 'all';
+  let filterFase = 'all';
+  let filterCurso = 'all';
+  let searchQuery = '';
+
+  function setFilterTemp(v) {
+    filterTemp = v;
+    document.querySelectorAll('[data-group="temp"]').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-group="temp"][data-val="${v}"]`)?.classList.add('active');
+    renderLeads();
+  }
+  function setFilterFase(v) {
+    filterFase = v;
+    document.querySelectorAll('[data-group="fase"]').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-group="fase"][data-val="${v}"]`)?.classList.add('active');
+    renderLeads();
+  }
+  function setFilterCurso(v) {
+    filterCurso = v;
+    document.querySelectorAll('[data-group="curso"]').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-group="curso"][data-val="${v}"]`)?.classList.add('active');
+    renderLeads();
+  }
+
+  let filterFechaDesde = '';
+  let filterFechaHasta = '';
+  let filterVisita = 'all';
+
+  function setFilterFecha() {
+    filterFechaDesde = document.getElementById('filtroDesde').value;
+    filterFechaHasta = document.getElementById('filtroHasta').value;
+    renderLeads();
+  }
+  function clearFilterFecha() {
+    filterFechaDesde = '';
+    filterFechaHasta = '';
+    document.getElementById('filtroDesde').value = '';
+    document.getElementById('filtroHasta').value = '';
+    renderLeads();
+  }
+  function toggleVisitaFilter() {
+    filterVisita = filterVisita === 'con_visita' ? 'all' : 'con_visita';
+    document.getElementById('chipConVisita').classList.toggle('active', filterVisita === 'con_visita');
+    document.getElementById('chipVisitaSinCerrar').classList.remove('active');
+    renderLeads();
+  }
+
+  function toggleVisitaSinCerrar() {
+    filterVisita = filterVisita === 'visita_sin_cerrar' ? 'all' : 'visita_sin_cerrar';
+    document.getElementById('chipVisitaSinCerrar').classList.toggle('active', filterVisita === 'visita_sin_cerrar');
+    document.getElementById('chipConVisita').classList.remove('active');
+    renderLeads();
+  }
+  function setFilterVisita(v) { filterVisita = v; renderLeads(); }
+
+  function parseDate(str) {
+    if (!str) return null;
+    const clean = str.trim().replace('+00:00','').replace('Z','');
+    const d = new Date(clean);
+    return isNaN(d) ? null : d;
+  }
+
+  // ---- PANELS ----
+  function togglePanel(id) {
+    const body = document.getElementById(id);
+    const arrow = document.getElementById(id + '-arrow');
+    body.classList.toggle('open');
+    arrow.textContent = body.classList.contains('open') ? '▲' : '▼';
+  }
+
+
+
+  // ---- CSV IMPORT ----
+  let csvRows = [];
+  let selectedFases = new Set();
+
+  function parseCSV(text) {
+    // Normalizar saltos de línea Windows/Mac/Unix
+    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const rows = [];
+    let cur = '', inQuote = false, cells = [];
+    for (let i = 0; i <= text.length; i++) {
+      const ch = i < text.length ? text[i] : '\n';
+      if (ch === '"') {
+        if (inQuote && text[i+1] === '"') { cur += '"'; i++; }
+        else { inQuote = !inQuote; }
+      } else if (ch === ',' && !inQuote) {
+        cells.push(cur.trim());
+        cur = '';
+      } else if (ch === '\n' && !inQuote) {
+        cells.push(cur.trim());
+        if (cells.some(c => c)) rows.push(cells);
+        cells = []; cur = '';
+      } else {
+        cur += ch;
+      }
+    }
+    return rows;
+  }
+
+  // Normaliza la fase del CSV al valor canónico que usan los filtros
+  function normalizeFase(fase) {
+    const f = (fase||'').toLowerCase().trim();
+    if (f.includes('ganada'))                          return 'Ganada';
+    if (f.includes('info'))                            return 'Info enviada';
+    if (f.includes('recuper') || f.includes('recup')) return 'Recupón';
+    if (f.includes('ilocaliz'))                        return 'Ilocalizable';
+    if (f.includes('null') || f.includes('cerrada'))   return 'Cerrada - Null';
+    if (f.includes('baja'))                            return 'Baja';
+    return fase.trim();
+  }
+
+  function mapFaseToEstado(fase) {
+    const f = (fase||'').toLowerCase();
+    if (f.includes('ganada')) return 'cerrado';
+    if (f.includes('info')) return 'contactado';
+    if (f.includes('recuper') || f.includes('recup')) return 'pendiente';
+    if (f.includes('baja') || f.includes('null') || f.includes('ilocaliz') || f.includes('cerrada')) return 'frio';
+    return 'pendiente';
+  }
+
+  // ── SEMÁFORO INTELIGENTE ─────────────────────────────────────────────
+  // Evalúa fase + notas + días sin contacto siguiendo criterios del Manual
+  // 🔥 CALIENTE: preguntó precio/matrícula/fechas, urgencia, compara, vuelve a escribir
+  // 🌡️ TIBIO:    interés claro pero freno operativo, necesita más tiempo
+  // ❄️ FRÍO:     vaguada informativa, sin respuesta, >14 días, baja/null
+  function mapFaseToTemp(fase, nota, fechaStr) {
+    const f    = (fase  || '').toLowerCase();
+    const n    = (nota  || '').toLowerCase();
+
+    // Fases administrativas cerradas → siempre frío
+    if (f.includes('baja') || f.includes('null') || f.includes('ilocaliz') || f.includes('cerrada')) return 'cold';
+    // Ganada ya no necesita seguimiento
+    if (f.includes('ganada')) return 'hot';
+
+    // ── Señales CALIENTE en notas ──────────────────────────────────────
+    const senalesHot = [
+      'precio', 'matrícula', 'matricula', 'pago', 'reserva', 'plaza',
+      'cuánto cuesta', 'cuanto cuesta', 'cuándo empieza', 'cuando empieza',
+      'fecha', 'septiembre', 'octubre', 'enero', 'quiero empezar',
+      'quiero matricularme', 'voy a', 'confirmado', 'comparando',
+      'otro centro', 'otra academia', 'descuento', 'financiación', 'financiacion',
+      'urgente', 'urgencia', 'esta semana', 'hoy', 'mañana', 'cita',
+      '🔁', 'ha vuelto', 'vuelve', 'segunda vez', 'repite'
+    ];
+    const esHotPorNota = senalesHot.some(s => n.includes(s));
+
+    // ── Señales TIBIO en notas ─────────────────────────────────────────
+    const senalesWarm = [
+      'interés', 'interes', 'interesado', 'interesada',
+      'info enviada', 'pendiente', 'pensándolo', 'pensandolo',
+      'lo está pensando', 'me lo tengo que pensar', 'dudas',
+      'horario', 'modalidad', 'online', 'presencial', 'compaginarlo',
+      'trabajo', 'turno', 'reenganche', 'recuper', 'retomar'
+    ];
+    const esWarmPorNota = senalesWarm.some(s => n.includes(s));
+
+    // ── Días sin contacto ──────────────────────────────────────────────
+    let diasSinContacto = 0;
+    if (fechaStr) {
+      const fecha = new Date(fechaStr);
+      if (!isNaN(fecha)) {
+        diasSinContacto = Math.floor((Date.now() - fecha.getTime()) / 86400000);
+      }
+    }
+    const muySilencioso = diasSinContacto > 14;  // >2 semanas → frío
+    const bastanteSilencioso = diasSinContacto > 7; // >1 semana → empuja a tibio
+
+    // ── Fase administrativa como señal base ────────────────────────────
+    const faseEsCaliente = f.includes('cita') || f.includes('visita') || f.includes('presupuesto');
+    const faseEsTibia    = f.includes('info') || f.includes('recuper') || f.includes('pendiente');
+
+    // ── Decisión final ─────────────────────────────────────────────────
+    if (muySilencioso && !esHotPorNota) return 'cold';
+    if (esHotPorNota || faseEsCaliente) return 'hot';
+    if (bastanteSilencioso && !esWarmPorNota) return 'cold';
+    if (esWarmPorNota || faseEsTibia)   return 'warm';
+    return 'cold';
+  }
+  // ─────────────────────────────────────────────────────────────────────
+
+  function handleCSV(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const text = e.target.result;
+      const rows = parseCSV(text);
+      if (rows.length < 2) {
+        showImportResult('err', 'El archivo no tiene datos suficientes.');
+        return;
+      }
+      const headers = rows[0];
+      const dataRows = rows.slice(1);
+
+      // Búsqueda flexible de columnas (insensible a mayúsculas, tildes y espacios)
+      function findCol(headers, variants) {
+        const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[\s_-]+/g,'');
+        const normVariants = variants.map(norm);
+        return headers.findIndex(h => normVariants.includes(norm(h)));
+      }
+
+      const idx = {
+        nombre:    findCol(headers, ['Nombre','Name']),
+        apellidos: findCol(headers, ['Apellidos','Apellido','Surname','Last name']),
+        curso:     findCol(headers, ['Curso','Ciclo','Course']),
+        fase:      findCol(headers, ['Fase_venta','Fase venta','Fase','Phase']),
+        notas:     findCol(headers, ['Notas seguimiento','Notas','Nota','Notes','Observaciones']),
+        fecha:     findCol(headers, ['Fecha_seguimiento','Fecha seguimiento','Fecha','Date']),
+        telefono:  findCol(headers, ['Telefono','Teléfono','Phone','Tel','Movil','Móvil','Mobile']),
+        email:     findCol(headers, ['email','Email','Mail','mail','Correo','E-mail','Correo electronico','Correo electrónico']),
+        fechaAsig: findCol(headers, ['Fecha_asignacion','Fecha asignacion','Fecha asignación','Fecha_asig']),
+        fechaCita: findCol(headers, ['Fecha_cita','Fecha cita','Fecha visita','Cita'])
+      };
+
+      // Debug: muestra columnas detectadas (quitar tras verificar)
+      console.log('Columnas CSV:', headers);
+      console.log('Índices detectados:', idx);
+      if (idx.email === -1) showImportResult('warn', '⚠️ No se encontró columna de email. Columnas disponibles: ' + headers.join(', '));
+
+      if (idx.nombre === -1) {
+        showImportResult('err', 'No se encontró la columna "Nombre". Comprueba el CSV.');
+        return;
+      }
+
+      csvRows = dataRows.map((r, i) => ({
+        _id: 'csv_' + Date.now() + '_' + i + '_' + Math.random().toString(36).slice(2,7),
+        nombre: [(r[idx.nombre]||'').trim(), (r[idx.apellidos]||'').trim()].filter(Boolean).join(' '),
+        ciclo: (r[idx.curso]||'').trim(),
+        fase: (r[idx.fase]||'').trim(),
+        nota: (r[idx.notas]||'').trim().slice(0,200),
+        fecha: (r[idx.fecha]||'').trim().split('T')[0] || new Date().toISOString().split('T')[0],
+        telefono: (r[idx.telefono]||'').trim().replace(/\s+/g,''),
+        email: (r[idx.email]||'').trim().toLowerCase(),
+        fechaAsig: (r[idx.fechaAsig]||'').trim().split('T')[0],
+        fechaCitaRaw: (r[idx.fechaCita]||'').trim(),
+        fechaCita: (r[idx.fechaCita]||'').trim().split(/[T ]/)[0],
+        horaCita: (() => {
+          const raw = (r[idx.fechaCita]||'').trim();
+          const m = raw.match(/[T ](\d{2}):(\d{2})/);
+          if (!m) return '';
+          const datePart = raw.split(/[T ]/)[0];
+          const d = new Date(`${datePart}T${m[1]}:${m[2]}:00+00:00`);
+          if (isNaN(d)) return `${m[1]}:${m[2]}`;
+          return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });
+        })()
+      })).filter(r => !!r.nombre);
+
+      // Fases únicas — todas seleccionables, el usuario decide
+      const fases = [...new Set(csvRows.map(r => r.fase).filter(Boolean))].sort();
+      const fasesExcluidas = new Set(['Cerrada - Null', 'Baja']);
+      selectedFases = new Set(fases.filter(f => !fasesExcluidas.has(f))); // cerradas/bajas desmarcadas por defecto
+
+      document.getElementById('previewInfo').innerHTML = `<strong>${csvRows.length} leads encontrados</strong> en el CSV. Elige qué fases importar:`;
+
+      const chipsEl = document.getElementById('faseChips');
+      chipsEl.innerHTML = fases.map(f => `
+        <div class="fase-chip ${selectedFases.has(f) ? 'selected' : ''}" onclick="toggleFase(this,'${f.replace(/'/g,"\\'")}')">
+          ${f} <span style="opacity:0.6;font-size:0.68rem">(${csvRows.filter(r=>r.fase===f).length})</span>
+        </div>
+      `).join('');
+
+      document.getElementById('importPreview').classList.add('show');
+      document.getElementById('importResult').className = 'import-result';
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  function toggleFase(el, fase) {
+    if (selectedFases.has(fase)) { selectedFases.delete(fase); el.classList.remove('selected'); }
+    else { selectedFases.add(fase); el.classList.add('selected'); }
+  }
+
+  function doImport() {
+    const toImport = csvRows.filter(r => selectedFases.has(r.fase));
+    if (toImport.length === 0) {
+      showImportResult('err', 'Selecciona al menos una fase para importar.');
+      return;
+    }
+
+    let added = 0, updated = 0;
+    const returning = [];
+
+    // Índices hash para búsqueda O(1) en vez de O(n²)
+    const byTel  = {};
+    const byName = {};
+    leads.forEach(l => {
+      if (l.telefono) byTel[l.telefono] = l;
+      byName[l.nombre.toLowerCase()] = l;
+    });
+
+    toImport.forEach(r => {
+      const faseFinal = normalizeFase(r.fase);
+      const existing = (r.telefono && byTel[r.telefono]) || byName[(r.nombre||'').toLowerCase()];
+
+      if (existing) {
+        const faseAnterior = existing.fase || '';
+
+        if (byTel[r.telefono] && existing.nombre.toLowerCase() !== (r.nombre||'').toLowerCase()) {
+          existing.vuelve = (existing.vuelve || 1) + 1;
+          existing.temp = 'hot';
+          if (!(existing.nota || '').includes('🔁')) {
+            existing.nota = `🔁 Ha vuelto a pedir info (${existing.vuelve}ª vez) · ` + (existing.nota || '');
+          }
+          returning.push(existing.nombre);
+          updated++;
+          return;
+        }
+
+        existing.fase      = faseFinal;
+        existing.estado    = mapFaseToEstado(r.fase);
+        existing.ciclo     = r.ciclo || existing.ciclo;
+        existing.fecha     = r.fecha || existing.fecha;
+        existing.fechaCita = r.fechaCita;
+        existing.horaCita  = r.horaCita;
+        existing.importado = true;
+        // Historial, recordatorio y nota manual NO se tocan al reimportar
+        const tempOriginal = mapFaseToTemp(faseAnterior, existing.nota, existing.fecha);
+        if (existing.temp === tempOriginal) {
+          existing.temp = mapFaseToTemp(r.fase, r.nota, r.fecha);
+        }
+        updated++;
+
+      } else {
+        const lead = {
+          id: r._id || ('imp_' + Date.now() + '_' + Math.random().toString(36).slice(2,7)),
+          nombre: r.nombre,
+          ciclo: r.ciclo,
+          temp: mapFaseToTemp(r.fase, r.nota, r.fecha),
+          estado: mapFaseToEstado(r.fase),
+          fecha: r.fecha,
+          nota: r.nota,
+          telefono: r.telefono,
+          email: r.email,
+          fase: faseFinal,
+          fechaCita: r.fechaCita,
+          horaCita: r.horaCita,
+          importado: true
+        };
+        leads.push(lead);
+        // Actualizar índices
+        if (r.telefono) byTel[r.telefono] = lead;
+        byName[(r.nombre||'').toLowerCase()] = lead;
+        added++;
+      }
+    });
+
+    saveLeads();
+
+    // Resetear filtros → mostrar todos los leads recién importados
+    filterFase = 'all';
+    filterTemp = 'all';
+    filterCurso = 'all';
+    filterVisita = 'all';
+    filterFechaDesde = '';
+    filterFechaHasta = '';
+    searchQuery = '';
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchClear').style.display = 'none';
+    document.querySelectorAll('[data-group="fase"]').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-group="fase"][data-val="all"]')?.classList.add('active');
+    document.querySelectorAll('[data-group="temp"]').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-group="temp"][data-val="all"]')?.classList.add('active');
+    document.querySelectorAll('[data-group="curso"]').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-group="curso"][data-val="all"]')?.classList.add('active');
+    document.getElementById('chipConVisita')?.classList.remove('active');
+    document.getElementById('chipVisitaSinCerrar')?.classList.remove('active');
+
+    renderLeads();
+
+    let msg = '';
+    if (added)   msg += `✅ ${added} leads nuevos añadidos`;
+    if (updated) msg += `${msg ? ' · ' : ''}🔄 ${updated} leads actualizados (fase y estado)`;
+    if (returning.length) msg += `\n🔁 Repetidores detectados: ${returning.join(', ')}. ¡Contacta primero!`;
+    showImportResult(returning.length ? 'warn' : 'ok', msg || '✅ Hecho');
+    document.getElementById('importPreview').classList.remove('show');
+    csvRows = [];
+  }
+
+  function limpiarTodo() {
+    if (!confirm('⚠️ Se borrarán TODOS los leads. ¿Continuar?\n\nDespués reimporta el CSV actualizado.')) return;
+    leads = [];
+    saveLeads();
+    renderLeads();
+    showImportResult('ok', '✅ Lista limpia. Ahora sube el CSV de NocoDB.');
+  }
+
+  function showImportResult(type, msg) {
+    const el = document.getElementById('importResult');
+    el.className = 'import-result ' + type;
+    el.textContent = msg;
+  }
+
+  function dzOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+  function dzLeave() { document.getElementById('dropZone').classList.remove('drag-over'); }
+  function dzDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f) handleCSV(f);
+  }
+
+  // ---- AVISO VISITAS PRÓXIMAS ----
+  function initVisitasAlert() {
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
+    const en7dias = new Date(hoy);
+    en7dias.setDate(hoy.getDate() + 7);
+
+    const proximas = leads.filter(l => {
+      if (!l.fechaCita) return false;
+      // fechaCita puede ser "2025-05-15" o "2025-05-15T10:30:00+00:00"
+      const datePart = (l.fechaCita+'').trim().match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (!datePart) return false;
+      const fecha = new Date(+datePart[1], +datePart[2]-1, +datePart[3]);
+      return fecha >= hoy && fecha <= en7dias && getLeadFase(l) !== 'Ganada';
+    }).sort((a,b) => (a.fechaCita+'').localeCompare(b.fechaCita+''));
+
+    const alertEl = document.getElementById('visitasAlert');
+    if (proximas.length === 0) { alertEl.style.display = 'none'; return; }
+
+    const lista = proximas.map(l => {
+      const datePart = (l.fechaCita+'').trim().match(/(\d{4})-(\d{2})-(\d{2})/);
+      const [,yy,mm,dd] = datePart;
+      const hoyStr = `${String(hoy.getFullYear())}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+      const citaStr = `${yy}-${mm}-${dd}`;
+      const esHoy = citaStr === hoyStr;
+
+      // Extraer hora: de horaCita guardado (siempre correcto tras el import)
+      const hora = (l.horaCita||'').trim();
+
+      const cuando = esHoy
+        ? `<strong style="color:#DC2626;">HOY</strong>`
+        : `${dd}/${mm}`;
+      const horaStr2 = hora ? ` · <strong>${hora}h</strong>` : '';
+      const waUrl = l.telefono ? `whatsapp://send?phone=${l.telefono.replace(/\D/g,'')}` : '';
+
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #C7D2FE;gap:8px;">
+        <div style="font-size:0.82rem;min-width:0;">
+          <span>👤 <strong>${l.nombre}</strong></span>
+          ${l.ciclo ? `<span style="color:#6B7280;"> · ${l.ciclo}</span>` : ''}
+          ${l.telefono ? `<div style="display:flex;align-items:center;gap:6px;margin-top:3px;">
+            <a href="tel:${l.telefono}" style="color:#6B7280;font-size:0.75rem;text-decoration:none;">📞 ${l.telefono}</a>
+            ${waUrl ? `<a href="${waUrl}" style="font-size:0.7rem;background:#E8FBF0;color:#25D366;border:1px solid #b2e8c6;border-radius:12px;padding:2px 8px;text-decoration:none;white-space:nowrap;">💬 WhatsApp</a>` : ''}
+          </div>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <span style="color:#3730A3;font-weight:600;font-size:0.82rem;white-space:nowrap;">${cuando}${horaStr2}</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('visitasAlertList').innerHTML = lista;
+    alertEl.style.display = 'block';
+  }
+
+  // ---- PANEL HOY ----
+  function initPanelHoy() {
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
+    const todayStr = hoy.toISOString().split('T')[0];
+
+    const calientes     = leads.filter(l => l.temp === 'hot' && getLeadFase(l) !== 'Ganada');
+    const sinTocar3d    = leads.filter(l => daysSince(l.fecha) >= 3 && getLeadFase(l) !== 'Ganada' && l.temp !== 'cold');
+    const citasHoy      = leads.filter(l => l.fechaCita && l.fechaCita.startsWith(todayStr) && getLeadFase(l) !== 'Ganada');
+    const recordatoriosHoy = leads.filter(l => l.recordatorio === todayStr && getLeadFase(l) !== 'Ganada');
+
+    if (calientes.length === 0 && sinTocar3d.length === 0 && citasHoy.length === 0 && recordatoriosHoy.length === 0) {
+      document.getElementById('panelHoy').style.display = 'none';
+      return;
+    }
+
+    let html = '';
+
+    if (citasHoy.length > 0) {
+      html += `<div style="margin-bottom:8px;"><strong style="color:#3730A3;">🏫 Citas hoy (${citasHoy.length})</strong><div style="margin-top:4px;">`;
+      citasHoy.forEach(l => {
+        const hora = l.horaCita ? ` · ${l.horaCita}h` : '';
+        html += `<div style="padding:2px 0;">👤 <strong>${l.nombre}</strong>${hora} · ${l.ciclo || ''}</div>`;
+      });
+      html += '</div></div>';
+    }
+
+    if (recordatoriosHoy.length > 0) {
+      html += `<div style="margin-bottom:8px;"><strong style="color:#7A4E1A;">⏰ Recordatorios de hoy (${recordatoriosHoy.length})</strong><div style="margin-top:4px;">`;
+      recordatoriosHoy.forEach(l => {
+        const motivo = l.recordatorioNota ? ` — ${l.recordatorioNota}` : '';
+        html += `<div style="padding:2px 0;">👤 <strong>${l.nombre}</strong>${motivo}</div>`;
+      });
+      html += '</div></div>';
+    }
+
+    if (calientes.length > 0) {
+      html += `<div style="margin-bottom:8px;"><strong style="color:#B91C1C;">🔥 Calientes ahora (${calientes.length})</strong> — ciérralos hoy<div style="margin-top:4px;">`;
+      calientes.slice(0,5).forEach(l => {
+        const dias = daysSince(l.fecha);
+        const alerta = dias >= 3 ? ` <span style="color:var(--hot);font-size:0.72rem;">⚠️ ${dias}d sin tocar</span>` : '';
+        html += `<div style="padding:2px 0;">👤 <strong>${l.nombre}</strong> · ${l.ciclo || ''}${alerta}</div>`;
+      });
+      if (calientes.length > 5) html += `<div style="color:#888;font-size:0.75rem;">...y ${calientes.length - 5} más</div>`;
+      html += '</div></div>';
+    }
+
+    if (sinTocar3d.length > 0) {
+      html += `<div><strong style="color:#9A6B00;">⚡ Sin tocar 3+ días (${sinTocar3d.length})</strong> — actúa antes de que se enfríen</div>`;
+    }
+
+    document.getElementById('panelHoyContent').innerHTML = html;
+    document.getElementById('panelHoy').style.display = 'block';
+  }
+
+  // ---- BACKUP JSON ----
+  function exportarJSON() {
+    const data = JSON.stringify(leads, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const fecha = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `crm_carmen_backup_${fecha}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function restaurarJSON(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onerror = function() {
+      alert('❌ No se pudo leer el archivo. Inténtalo de nuevo.');
+      input.value = '';
+    };
+    reader.onload = function(e) {
+      try {
+        let raw = e.target.result;
+        // Limpiar BOM y espacios sobrantes
+        raw = raw.replace(/^\uFEFF/, '').trim();
+        const datos = JSON.parse(raw);
+        if (!Array.isArray(datos)) {
+          alert('❌ El archivo no contiene una lista de leads válida.');
+          input.value = '';
+          return;
+        }
+        leads = datos;
+        saveLeads();
+        renderLeads();
+        updateStats();
+        initVisitasAlert();
+        alert(`✅ ${leads.length} leads restaurados correctamente.`);
+      } catch(err) {
+        alert('❌ Error al parsear el JSON: ' + err.message);
+      }
+      input.value = '';
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  // ---- INIT ----
+  loadLeads();
+  initDate();
+  renderLeads();
+  initVisitasAlert();
+</script>
+<!-- MODAL SCRIPTS -->
+<div id="modalScripts" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;overflow-y:auto;padding:16px;">
+  <div style="background:#fff;border-radius:16px;max-width:500px;margin:0 auto;overflow:hidden;">
+    <div style="background:var(--accent);color:white;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-weight:700;font-size:1rem;">💬 Scripts para <span id="scriptLeadNombre"></span></div>
+        <div style="font-size:0.75rem;opacity:0.85;" id="scriptLeadCiclo"></div>
+      </div>
+      <button onclick="cerrarScripts()" style="background:none;border:none;color:white;font-size:1.4rem;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div style="padding:14px 16px;">
+      <div id="scriptFaseBadge" style="margin-bottom:12px;"></div>
+      <div id="scriptCards" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- SCRIPTS POR FASE ----
+  const SCRIPTS = {
+    'Info enviada': [
+      { label: '1️⃣ Toque 1 – Directa', color: '#0f3460', texto: 'Hola [Nombre], soy Carmen del Instituto Forma-t 😊 Te mandé info hace unos días, ¿qué te ha parecido?' },
+      { label: '1️⃣ Toque 1 – Empática', color: '#1e8449', texto: 'Hola [Nombre], soy Carmen del Instituto Forma-t 😊 Te envié la info hace unos días. ¿Pudiste verla? Cualquier duda que tengas, me dices.' },
+      { label: '2️⃣ Toque 2 – Directa', color: '#1a5276', texto: 'Hola [Nombre], soy Carmen. ¿Sigues interesado/a en uno de nuestros ciclos formativos o lo has descartado de momento?\n\nSin problema si no es el momento, dímelo y ya está 😊' },
+      { label: '2️⃣ Toque 2 – Empática', color: '#1e8449', texto: 'Hola [Nombre] 😊 Solo quería saber cómo lo llevas, si le estás dando vueltas o lo tienes aparcado.\n\nCuando quieras hablarlo, aquí estoy.' },
+      { label: '3️⃣ Toque 3 – Urgencia', color: '#ca6f1e', texto: 'Hola [Nombre] 😊 El grupo de septiembre está casi cerrado y no quería que te quedaras sin plaza si todavía lo estás valorando.\n\n¿Lo has podido pensar?' },
+    ],
+    'Recupón': [
+      { label: '🟡 Recupón – Directa', color: '#ca6f1e', texto: 'Hola 😊 Soy Carmen del Instituto Forma-t.\n\nHace un tiempo pediste info sobre uno de nuestros ciclos formativos y quería saber si sigue en mente o lo has descartado.\n\nEstamos cerrando plazas para septiembre (grupos de máx. 20) y si te interesa retomarlo, te actualizo todo en un momento.\n\n¿Qué me dices?' },
+      { label: '💙 Recupón – Emocional', color: '#2e86c1', texto: 'Hola [Nombre], soy Carmen del centro.\n\nHace un tiempo hablamos sobre formación sanitaria y me he acordado de ti al revisar solicitudes anteriores.\n\nQuería saber en qué punto estás ahora y si sigues valorando esta opción. Han cambiado algunas condiciones y puede ser una buena oportunidad si aún lo tienes en mente. Si quieres, te actualizo la información sin compromiso.' },
+      { label: '🌱 Recupón – Sin requisitos', color: '#117a65', texto: 'Hola [Nombre], soy Carmen del centro de formación sanitaria.\n\nEn su momento no pudimos avanzar por los requisitos de acceso, pero te escribo porque han surgido nuevas opciones y alternativas que antes no teníamos.\n\n¿Te gustaría que le echemos otro vistazo a tu caso, a ver si ahora encaja alguna vía para ti?\n\nSi te interesa, lo vemos rápido por aquí.' },
+      { label: '🔒 Presión cierre', color: '#ca6f1e', texto: 'Hola [Nombre], ¿sigues interesado/a en uno de nuestros ciclos formativos?\n\nLos grupos son reducidos (máximo 20 alumnos) y ya estamos cerrando matrículas para septiembre — se están llenando rápido.\n\nSi quieres, podemos quedar un día para que veas el centro y resolvamos dudas.' },
+    ],
+    'Ilocalizable': [
+      { label: '📨 Primer contacto – No contesta', color: '#1e8449', texto: 'Hola [Nombre] 😊 Soy Carmen, del Instituto Forma-t. Intenté llamarte porque vi que pediste info sobre uno de nuestros ciclos.\n\nSomos un centro privado en Barcelona, con grupos pequeños (máx. 20 alumnos) y plaza garantizada sin nota de corte.\n\n¿Qué estudios tienes terminados? Así te digo qué opciones tienes 😊' },
+      { label: '💼 Primer contacto + precio', color: '#1e8449', texto: 'Hola [Nombre]! Soy Carmen, del Instituto Forma-t.\n\nTe he intentado llamar pero no te he pillado 😊\n\nUna cosa importante antes de nada: somos centro privado, o sea que los ciclos tienen coste (aunque tenemos pago fraccionado). Te lo digo ya para no hacerte perder el tiempo.\n\nSi te cuadra, cuéntame qué ciclo te interesa y qué estudios tienes, y te oriento.' },
+      { label: '🌿 Reenganche suave', color: '#117a65', texto: 'Hola [Nombre] 😊\n\nPor si se perdió mi mensaje anterior: ¿sigues valorando uno de nuestros ciclos formativos o lo has dejado de momento?' },
+    ],
+    'Baja': [
+      { label: '🔴 Breakup amable', color: '#922b21', texto: 'Hola [Nombre] 😊\n\nTe escribo por última vez porque no he tenido noticias tuyas y no quiero ser pesada si ahora no es el momento.\n\nSi en algún momento te apetece retomarlo, aquí estaré.\n\nGracias por el interés y ¡te deseo todo lo mejor! 🌟' },
+      { label: '🌱 Cierre positivo', color: '#1e8449', texto: 'Hola [Nombre] 😊\n\nComo no he tenido noticias tuyas, no voy a seguir escribiéndote para no ser pesada.\n\nSi cambias de idea, escríbeme cuando quieras (habrá plazas nuevas pronto).\n\n¡Gracias y todo lo mejor! 💙' },
+      { label: '⚡ Último intento – Ultra-corta', color: '#7b241c', texto: 'Hola [Nombre] 😊\n\nÚltimo aviso: quedan muy pocas plazas y cerramos el grupo ya.\n\n¿Te apunto o lo dejamos para más adelante?\n\nGracias y ¡suerte! 🌟' },
+    ],
+    'Cerrada - Null': [
+      { label: '💬 Último toque', color: '#922b21', texto: 'Hola [Nombre] 😊\n\nÚltimo mensaje, que no quiero molestarte si no es el momento.\n\n¿Sigues interesado/a en uno de nuestros ciclos formativos?\n\nSi no me dices nada, cierro la solicitud por aquí. Y si más adelante cambias de idea, ya sabes dónde estoy.' },
+      { label: '🌿 Cierre elegante', color: '#6c3483', texto: 'Hola [Nombre], espero que estés muy bien 😊\n\nComo no hemos vuelto a hablar, entiendo que ahora mismo no es el momento para ti.\n\nSi en el futuro cambias de opinión o necesitas orientación, aquí me tienes 🙌' },
+    ],
+    'default': [
+      { label: '📨 Mensaje inicial', color: '#1e8449', texto: 'Hola [Nombre] 😊 Soy Carmen, del Instituto Forma-t. Intenté llamarte porque vi que pediste info sobre uno de nuestros ciclos.\n\nSomos un centro privado en Barcelona, con grupos pequeños (máx. 20 alumnos) y plaza garantizada sin nota de corte.\n\n¿Qué estudios tienes terminados? Así te digo qué opciones tienes 😊' },
+      { label: '1️⃣ Seguimiento – Directa', color: '#0f3460', texto: 'Hola [Nombre], soy Carmen del Instituto Forma-t 😊 Te mandé info hace unos días, ¿qué te ha parecido?' },
+      { label: '4️⃣ Último intento', color: '#922b21', texto: 'Hola [Nombre], soy Carmen. Como no he tenido noticias, entiendo que lo has dejado para otro momento.\n\nSi en algún momento lo retomas, me escribes y lo vemos 😊' },
+    ]
+  };
+
+  const SCRIPTS_VISITA_CONFIRMACION = [
+    { label: '✅ Confirmación – Día de la visita', color: '#0f3460', texto: 'Hola [Nombre] 😊 ¿Seguimos en pie para hoy en el centro? Te espero, ¡gracias!' },
+    { label: '✅ Confirmación – Víspera', color: '#1e8449', texto: 'Hola [Nombre] 😊 Te confirmo que mañana tenemos la visita al centro. ¿Todo bien por tu parte? Si surge algo, avísame.' },
+    { label: '📍 Recordatorio con dirección – Vilardell', color: '#117a65', texto: 'Hola [Nombre],\n\nTe espero el [FECHA_CITA] a las [HORA_CITA]\n\n📍 C/ Vilardell, 38 – Barcelona\n👉 https://maps.app.goo.gl/mYnYjpRVCnZb9rNh8\n\nSi no puedes venir, avísame con antelación y buscamos otro momento.\n\n¡Gracias!' },
+    { label: '📍 Recordatorio con dirección – Sant Pere d\'Abanto', color: '#6c3483', texto: 'Hola [Nombre],\n\nTe espero el [FECHA_CITA] a las [HORA_CITA]\n\n📍 C/ Sant Pere d\'Abanto, 4 – Barcelona\n👉 https://maps.app.goo.gl/wGMeHZGfcDeazqwC7\n\nSi no puedes venir, avísame con antelación y buscamos otro momento.\n\n¡Gracias!' },
+    { label: '👨‍👩‍👧 Recordatorio – Padres/Madres', color: '#ca6f1e', texto: 'Hola [Nombre],\n\nSolo quería recordaros que tenemos la visita el [FECHA_CITA] a las [HORA_CITA].\n\n📍 C/ Sant Pere d\'Abanto, 4 – Barcelona\n\nSi necesitáis cambiarla, escribidme sin problema.\n\n¡Nos vemos pronto!' },
+  ];
+
+  const SCRIPTS_POST_VISITA = [
+    { label: '💬 Post-visita – Directa', color: '#0f3460', texto: 'Hola [Nombre],\n\n¿Qué tal te fue la visita? 😊\n\n¿Tienes ya alguna duda concreta o necesitas un empujoncito para decidir?' },
+    { label: '💬 Post-visita – Cercana', color: '#1e8449', texto: 'Hola [Nombre],\n\n¿Qué tal te fue la visita? 😊\n\n¿Alguna duda o ya tienes clara la decisión?\n\nDime y seguimos.' },
+    { label: '💬 Post-visita – Con urgencia', color: '#117a65', texto: 'Hola [Nombre],\n\n¿Qué te pareció la visita? Me gustaría saber si encaja con lo que estás buscando o si tienes alguna duda antes de decidir.\n\nTe recuerdo que los grupos son reducidos (20 alumnos), así que si te interesa, mejor no esperar mucho para reservar plaza.' },
+    { label: '👨‍👩‍👧 Post-visita – A padres', color: '#6c3483', texto: 'Hola [Nombre], soy Carmen, la asesora del centro.\n\n¡Un placer conoceros hoy! 😊\n\nSi tenéis alguna duda o queréis asegurar la plaza, decídmelo cuando queráis.' },
+  ];
+
+  const SCRIPTS_OBJECIONES = [
+    { label: '💰 "Es muy caro"', color: '#922b21', texto: 'Entiendo que el precio sea lo que más te frene 😊\n\nNo es gratis como la pública, pero tampoco dependes de nota de corte ni de listas de espera eternas, y la plaza queda garantizada en cuanto formalizas. Además tenemos pago fraccionado bastante cómodo, en varios meses.\n\n¿Quieres que te pase las opciones de pago para tu caso? Así lo ves con calma.' },
+    { label: '🤔 "Lo tengo que pensar"', color: '#1a5276', texto: 'Hola [Nombre] 😊\n\nSin problema, tómate el tiempo que necesites.\n\nSolo para organizarme: ¿sigues con ganas de hacerlo o prefieres que lo dejemos para otra convocatoria más adelante? Como veas, sin compromiso.' },
+    { label: '👫 "Lo consulto con mi pareja/familia"', color: '#117a65', texto: 'Hola [Nombre], sin problema 😊\n\nCuando lo hayáis hablado, dime y seguimos.\n\nSolo te comento que los grupos son de 20 alumnos y las plazas se van cubriendo por orden de matrícula — si lo tenéis claro, mejor no esperar demasiado.' },
+    { label: '🌱 Cierre sin presión + PDF', color: '#2e86c1', texto: 'No hay prisa, [Nombre], es una decisión importante 🌱\n\nPero con datos claros se decide mejor. Puedo mandarte un PDF con precios y pagos fraccionados, plan de estudios, salidas laborales y testimonios de alumnos.\n\n¿Te lo envío? Así lo ves con calma y seguimos hablando cuando quieras 😊' },
+    { label: '⏰ Urgencia real sin presionar', color: '#ca6f1e', texto: 'Hola 😊 Te cuento cómo funciona: al ser un centro privado, las plazas no van por nota sino por orden de matrícula, y se van llenando a medida que la gente se apunta.\n\nLas clases son reducidas (20 alumnos), así que suelen completarse antes de empezar el curso.\n\nCuando quieras, te explico cómo hacer la reserva.' },
+  ];
+
+  const SCRIPTS_MATRICULA = [
+    { label: '📋 Cómo reservar plaza', color: '#0f3460', texto: 'Hola [Nombre]\n\nPerfecto, te explico cómo hacerlo.\n\nPuedes reservar tu plaza online directamente desde aquí:\n👉 institutoformat.com/pago-online\n(introduce tu nombre y apellidos correctamente)\n\nLa matrícula es de 400€ y una vez realizado el pago y entregada la documentación, tu plaza queda confirmada.\n\nSi eliges pago fraccionado, la primera cuota no se cobra hasta el 10 de octubre de 2026, por lo que ahora solo abonas la matrícula para asegurar tu plaza.\n\nDocumentación necesaria:\n– DNI o NIE (foto por ambas caras)\n– Título de acceso\n– Tarjeta sanitaria y número de Seguridad Social\n– Teléfono y correo electrónico\n– Si pagas a plazos: número de cuenta y certificado de titularidad' },
+    { label: '🔗 Enlace pago matrícula', color: '#1a5276', texto: 'Hola 😊 Te dejo el enlace para que puedas hacer la reserva de tu matrícula:\n\n🔗 https://institutoformat.com/pago-online/\n\nUna vez realizado el pago, por favor envíame el comprobante por aquí.\n\n¡Gracias! Si tienes cualquier duda, dime.' },
+    { label: '💳 Pago único – Transferencia', color: '#1e8449', texto: 'Hola [Nombre] 😊\n\nComo vas a realizar el pago único, te paso los datos para la transferencia:\nIBAN: ES62 0081 0185 10 0001 3453 44\nTitular: FORMACIÓ INTEL·LIGENT, S.L.\nConcepto: nombre y apellidos del alumno\n\nDocumentación necesaria:\n✓ DNI o NIE (por ambas caras)\n✓ Teléfono y correo del alumno\n✓ Último título académico\n✓ Tarjeta sanitaria o nº Seguridad Social\n\nCuando realices la transferencia, envíame el comprobante.\n\nMuchas gracias 😊' },
+    { label: '📲 Matrícula a distancia', color: '#6c3483', texto: 'Hola 😊 No te preocupes, puedes hacer todo el proceso a distancia, no es necesario que vengas al centro.\n\nEl primer paso es realizar el pago de la matrícula para reservar tu plaza:\n👉 institutoformat.com/pago-online\n\nUna vez pagado, envíame el comprobante y la documentación por aquí.\n\nSi más adelante quieres venir al centro, será un placer recibirte 😊' },
+    { label: '🎉 Bienvenida', color: '#117a65', texto: 'Hola [Nombre],\n\n¡Bienvenido/a al instituto! Encantada de tenerte con nosotros 😊\n\nEn breve te paso la ficha de alumno/a y el contrato de pago a plazos — necesito que me los devuelvas firmados (foto o PDF está bien).\n\nCualquier duda, aquí estoy.' },
+  ];
+
+  function crearScriptCard(s, nombre, telLimpio) {
+    const textoBase = s.texto
+      .replace(/\[Nombre\]/g, nombre)
+      .replace(/\[nombre\]/g, nombre);
+
+    const tieneGenero = /interesado\/a|apuntado\/a|dispuesto\/a/.test(textoBase);
+    const cardId = 'scard_' + (scriptCardCounter++);
+
+    const card = document.createElement('div');
+    card.id = cardId;
+    card.style.cssText = 'border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;';
+
+    const header = document.createElement('div');
+    header.style.cssText = `background:${s.color};color:white;padding:8px 12px;font-size:0.78rem;font-weight:700;`;
+    header.textContent = s.label;
+    card.appendChild(header);
+
+    if (tieneGenero) {
+      const genRow = document.createElement('div');
+      genRow.style.cssText = 'display:flex;gap:6px;padding:8px 12px 0;background:#F9FAFB;';
+      const lbl = document.createElement('span');
+      lbl.style.cssText = 'font-size:0.72rem;color:#6B7280;align-self:center;';
+      lbl.textContent = 'Género:';
+      genRow.appendChild(lbl);
+      ['m','f'].forEach(g => {
+        const btn = document.createElement('button');
+        btn.dataset.gen = g;
+        btn.style.cssText = 'padding:3px 10px;border-radius:20px;border:1px solid #D1D5DB;font-size:0.72rem;font-weight:600;cursor:pointer;background:white;';
+        btn.textContent = g === 'm' ? '♂ Él' : '♀ Ella';
+        btn.addEventListener('click', () => aplicarGenero(cardId, g, telLimpio));
+        genRow.appendChild(btn);
+      });
+      card.appendChild(genRow);
+    }
+
+    const textoDiv = document.createElement('div');
+    textoDiv.className = 'script-texto';
+    textoDiv.style.cssText = 'padding:10px 12px;font-size:0.8rem;color:#374151;white-space:pre-wrap;line-height:1.5;';
+    textoDiv.dataset.base = textoBase;
+    textoDiv.textContent = textoBase;
+    card.appendChild(textoDiv);
+
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:8px;padding:8px 12px;background:#F9FAFB;border-top:1px solid #E5E7EB;';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.style.cssText = 'flex:1;padding:7px;background:white;border:1px solid #D1D5DB;border-radius:7px;font-size:0.75rem;font-weight:600;cursor:pointer;';
+    copyBtn.textContent = '📋 Copiar';
+    copyBtn.dataset.texto = textoBase;
+    copyBtn.addEventListener('click', () => copiarScript(copyBtn));
+    btnRow.appendChild(copyBtn);
+
+    if (telLimpio) {
+      const waBtn = document.createElement('a');
+      waBtn.className = 'wa-btn';
+      waBtn.href = 'whatsapp://send?phone=' + telLimpio + '&text=' + encodeURIComponent(textoBase);
+      waBtn.style.cssText = 'flex:1;padding:7px;background:#25D366;color:white;border-radius:7px;font-size:0.75rem;font-weight:600;text-decoration:none;text-align:center;display:block;';
+      waBtn.textContent = '💬 Enviar WA';
+      btnRow.appendChild(waBtn);
+    }
+
+    card.appendChild(btnRow);
+    return card;
+  }
+
+  function crearSectionHeader(texto) {
+    const h = document.createElement('div');
+    h.style.cssText = 'font-size:0.75rem;font-weight:700;color:#7A6F65;text-transform:uppercase;letter-spacing:0.5px;margin:6px 0 -2px;padding-top:6px;border-top:1px solid #EDE9E3;';
+    h.textContent = texto;
+    return h;
+  }
+
+  let scriptCardCounter = 0;
+
+  function verScripts(id) {
+    const l = leads.find(x => x.id === id);
+    if (!l) return;
+    const primerNombre = (l.nombre || '').split(' ')[0];
+    const nombre = primerNombre.charAt(0).toUpperCase() + primerNombre.slice(1).toLowerCase();
+    const ciclo = l.ciclo || '';
+    const fase = getLeadFase(l);
+    const telLimpio = (l.telefono || '').replace(/\D/g,'');
+
+    document.getElementById('scriptLeadNombre').textContent = nombre;
+    document.getElementById('scriptLeadCiclo').textContent = ciclo ? '📚 ' + ciclo : '';
+    document.getElementById('scriptFaseBadge').innerHTML = fase ? `<span style="background:#EEF2FF;color:#3730A3;font-size:0.75rem;font-weight:600;padding:4px 10px;border-radius:20px;">Fase: ${fase}</span>` : '';
+
+    const container = document.getElementById('scriptCards');
+    container.innerHTML = '';
+    scriptCardCounter = 0;
+
+    // ---- SECCIÓN VISITA (confirmación o post-visita) ----
+    if (l.fechaCita) {
+      const datePart = (l.fechaCita+'').trim().match(/(\d{4})-(\d{2})-(\d{2})/);
+      let esFutura = true;
+      if (datePart) {
+        const hoy = new Date(); hoy.setHours(0,0,0,0);
+        const fechaCitaDate = new Date(+datePart[1], +datePart[2]-1, +datePart[3]);
+        esFutura = fechaCitaDate >= hoy;
+      }
+      const fechaStr = formatFechaConHora(l.fechaCita);
+
+      if (esFutura) {
+        container.appendChild(crearSectionHeader('📅 Confirmación de visita'));
+        SCRIPTS_VISITA_CONFIRMACION.forEach(s => {
+          let textoAdaptado = s.texto.replace(/\[FECHA_CITA\]/g, fechaStr);
+          if (l.horaCita) {
+            textoAdaptado = textoAdaptado.replace(/\[HORA_CITA\]/g, l.horaCita);
+          } else {
+            textoAdaptado = textoAdaptado.replace(/ a las \[HORA_CITA\]/g, '');
+          }
+          container.appendChild(crearScriptCard(Object.assign({}, s, { texto: textoAdaptado }), nombre, telLimpio));
+        });
+      } else if (fase !== 'Ganada') {
+        container.appendChild(crearSectionHeader('🏫 Seguimiento post-visita'));
+        SCRIPTS_POST_VISITA.forEach(s => container.appendChild(crearScriptCard(s, nombre, telLimpio)));
+      }
+    }
+
+    // ---- SECCIÓN FASE ----
+    const scripts = fase === 'Ganada' ? SCRIPTS_MATRICULA : (SCRIPTS[fase] || SCRIPTS['default']);
+    container.appendChild(crearSectionHeader(fase === 'Ganada' ? '🎉 Matrícula y bienvenida' : '💬 Mensajes para esta fase'));
+    scripts.forEach(s => container.appendChild(crearScriptCard(s, nombre, telLimpio)));
+
+    // ---- SECCIÓN OBJECIONES ----
+    container.appendChild(crearSectionHeader('💡 Objeciones rápidas'));
+    SCRIPTS_OBJECIONES.forEach(s => container.appendChild(crearScriptCard(s, nombre, telLimpio)));
+
+    document.getElementById('modalScripts').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function aplicarGenero(cardId, gen, tel) {
+    const card = document.getElementById(cardId);
+    const textoDiv = card.querySelector('.script-texto');
+    const copyBtn = card.querySelector('button[data-texto]');
+    const waBtn = card.querySelector('.wa-btn');
+
+    let texto = textoDiv.getAttribute('data-base');
+    if (gen === 'f') {
+      texto = texto
+        .replace(/interesado\/a/g, 'interesada')
+        .replace(/apuntado\/a/g, 'apuntada')
+        .replace(/dispuesto\/a/g, 'dispuesta');
+    } else {
+      texto = texto
+        .replace(/interesado\/a/g, 'interesado')
+        .replace(/apuntado\/a/g, 'apuntado')
+        .replace(/dispuesto\/a/g, 'dispuesto');
+    }
+
+    textoDiv.textContent = texto;
+    copyBtn.setAttribute('data-texto', texto);
+    if (waBtn && tel) waBtn.href = 'whatsapp://send?phone=' + tel + '&text=' + encodeURIComponent(texto);
+
+    card.querySelectorAll('[data-gen]').forEach(b => b.style.background = 'white');
+    card.querySelector('[data-gen="' + gen + '"]').style.background = gen === 'f' ? '#FDE8F0' : '#E8F0FD';
+  }
+
+  function cerrarScripts() {
+    document.getElementById('modalScripts').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function copiarScript(btn) {
+    const texto = btn.getAttribute('data-texto');
+    navigator.clipboard.writeText(texto).then(() => {
+      btn.textContent = '✅ Copiado';
+      setTimeout(() => btn.textContent = '📋 Copiar', 2000);
+    }).catch(() => {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = texto;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.textContent = '✅ Copiado';
+      setTimeout(() => btn.textContent = '📋 Copiar', 2000);
+    });
+  }
+</script>
+</body>
+</html>
